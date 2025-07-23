@@ -9,36 +9,47 @@ void take_forks(t_philo *philo)
     if (philo->id % 2 == 0)
     {
         pthread_mutex_lock(philo->right_fork);
-        if (!philo->data->someone_died)
-            print_state("has taken a fork", philo);
         if (philo->data->someone_died)
         {
             pthread_mutex_unlock(philo->right_fork);
             return;
         }
+        print_state("has taken a fork", philo);
+        
         pthread_mutex_lock(philo->left_fork);
-        if (!philo->data->someone_died)
-            print_state("has taken a fork", philo);
+        if (philo->data->someone_died)
+        {
+            pthread_mutex_unlock(philo->left_fork);
+            pthread_mutex_unlock(philo->right_fork);
+            return;
+        }
+        print_state("has taken a fork", philo);
     }
     else
     {
         pthread_mutex_lock(philo->left_fork);
-        if (!philo->data->someone_died)
-            print_state("has taken a fork", philo);
         if (philo->data->someone_died)
         {
             pthread_mutex_unlock(philo->left_fork);
             return;
         }
+        print_state("has taken a fork", philo);
+        
         pthread_mutex_lock(philo->right_fork);
-        if (!philo->data->someone_died)
-            print_state("has taken a fork", philo);
+        if (philo->data->someone_died)
+        {
+            pthread_mutex_unlock(philo->right_fork);
+            pthread_mutex_unlock(philo->left_fork);
+            return;
+        }
+        print_state("has taken a fork", philo);
     }
 }
 
 
 void    release_forks(t_philo *philo)
 {
+    // Always release forks, even if someone died
     pthread_mutex_unlock(philo->right_fork);
     pthread_mutex_unlock(philo->left_fork);
 }
