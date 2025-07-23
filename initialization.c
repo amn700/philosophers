@@ -52,7 +52,7 @@ void setup_philos(t_data *data, t_philo *philos)
 		philos[i].id = i + 1;
 		philos[i].data = data;
 		philos[i].times_eaten = 0;
-		philos[i].last_meal = philos->data->start_time;
+		philos[i].last_meal = data->start_time;
         i++;
     }
 }

@@ -14,7 +14,7 @@ void	ft_sleep(unsigned int milisec)
 				+ (current.tv_usec - start.tv_usec) / 1000;
 		if (elapsed >= milisec)
 			break;
-		usleep(80);
+		usleep(100);  // Reduced from 80 to 100 for better precision
 	}
 }
 
@@ -27,17 +27,16 @@ void	monitor_routine(t_data *data, t_philo *philos)
 
 	while (!data->someone_died)
 	{
-		usleep(80);
+		usleep(500);  // Reduced from 1000 for faster death detection
 		i = 0;
 		full_count = 0;
 		while (i < data->args.philo_count)
 		{
-			ft_sleep(1);
 			now = current_timestamp();
 			diff = now - philos[i].last_meal;
 			if (diff > data->args.time_to_die)
 				return die_philo(&philos[i]);
-			if (philos[i].times_eaten == philos->data->args.must_eat_count)
+			if (data->args.must_eat_count > 0 && philos[i].times_eaten >= data->args.must_eat_count)
 				full_count++;
 			i++;
 		}
@@ -52,7 +51,7 @@ void *philosopher_routine(void *arg)
 	t_philo *philo = (t_philo *)arg;
 
 	if (philo->id % 2 == 0)
-		usleep(300);
+		usleep(100);  // Reduced from 300 for faster startup
 	if (philo->data->args.philo_count == 1)
 	{
 		think_philo(philo);
@@ -62,11 +61,15 @@ void *philosopher_routine(void *arg)
 	while (!philo->data->someone_died)
 	{
 		think_philo(philo);
+		if (philo->data->someone_died) break;
 		take_forks(philo);
+		if (philo->data->someone_died) break;
 		eat_philo(philo);
+		if (philo->data->someone_died) break;
 		release_forks(philo);
 		if (philo->data->args.must_eat_count != -1 && philo->times_eaten >= philo->data->args.must_eat_count)
 			return (NULL);
+		if (philo->data->someone_died) break;
 		sleep_philo(philo);
 	}
 	return NULL;
@@ -107,4 +110,13 @@ int main (int argc, char **argv)
     i = 0;
 	while (i < args.philo_count)
 		pthread_join(philos[i++].thread, NULL);
+	
+	// Cleanup
+	i = 0;
+	while (i < args.philo_count)
+		pthread_mutex_destroy(&data.forks[i++]);
+	pthread_mutex_destroy(&data.print_lock);
+	free(data.forks);
+	free(philos);
+	return (0);
 }
