@@ -7,6 +7,24 @@ void take_forks(t_philo *philo)
     pthread_mutex_lock(philo->right_fork);
     print_state("has taken a fork", philo);
 }
+// void take_forks(t_philo *philo)
+// {
+//     if (philo->id % 2 == 0)
+//     {
+//         pthread_mutex_lock(philo->right_fork);
+//         print_state("has taken a fork", philo);
+//         pthread_mutex_lock(philo->left_fork);
+//         print_state("has taken a fork", philo);
+//     }
+//     else
+//     {
+//         pthread_mutex_lock(philo->left_fork);
+//         print_state("has taken a fork", philo);
+//         pthread_mutex_lock(philo->right_fork);
+//         print_state("has taken a fork", philo);
+//     }
+// }
+
 
 void    release_forks(t_philo *philo)
 {
@@ -29,7 +47,7 @@ void eat_philo(t_philo *philo)
         // philo->id,
         // philo->last_meal - philo->thinking_start);
     philo->times_eaten++;
-    usleep(philo->data->args.time_to_eat);
+    ft_sleep(philo->data->args.time_to_eat);
     // philo->last_meal = current_timestamp();
 
     // printf("philo %d ate %d time('s)\n", philo->id, philo->times_eaten);
@@ -40,7 +58,7 @@ void sleep_philo(t_philo *philo)
 {
     print_state("is sleeping", philo);
 
-    usleep(philo->data->args.time_to_sleep);
+    ft_sleep(philo->data->args.time_to_sleep);
     return ;
 }
 

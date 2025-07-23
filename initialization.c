@@ -24,7 +24,7 @@ bool    init_args(t_args *args, int argc, char **argv)
     return (true);
 }
 
-void    init_data(t_args args, t_philo *philos, t_data *data)
+void    init_data(t_args args, t_data *data)
 {
     struct timeval	tv;
 

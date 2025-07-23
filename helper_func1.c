@@ -11,19 +11,6 @@ void print_state(char *msg, t_philo *philo)
     pthread_mutex_unlock(&philo->data->print_lock);
 }
 
-// long long current_timestamp(void)
-// {
-// 	struct timeval tv;
-// 	gettimeofday(&tv, NULL);
-// 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-// }
-
-// long long timestamp_ms(t_data *data)
-// {
-// 	return current_timestamp() - data->start_time;
-// }
-
-
 long current_timestamp (void)
 {
     struct timeval tv;

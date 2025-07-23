@@ -1,5 +1,23 @@
 #include "philosophers.h"
 
+void	ft_sleep(unsigned int milisec)
+{
+	struct timeval start;
+	struct timeval current;
+	unsigned int elapsed;
+
+	gettimeofday(&start, NULL);
+	while (1)
+	{
+		gettimeofday(&current, NULL);
+		elapsed = (current.tv_sec - start.tv_sec) * 1000
+				+ (current.tv_usec - start.tv_usec) / 1000;
+		if (elapsed >= milisec)
+			break;
+		usleep(80);
+	}
+}
+
 void	monitor_routine(t_data *data, t_philo *philos)
 {
 	long long	diff;
@@ -9,10 +27,12 @@ void	monitor_routine(t_data *data, t_philo *philos)
 
 	while (!data->someone_died)
 	{
+		usleep(80);
 		i = 0;
 		full_count = 0;
 		while (i < data->args.philo_count)
 		{
+			ft_sleep(1);
 			now = current_timestamp();
 			diff = now - philos[i].last_meal;
 			if (diff > data->args.time_to_die)
@@ -22,8 +42,7 @@ void	monitor_routine(t_data *data, t_philo *philos)
 			i++;
 		}
 		if (data->args.must_eat_count > 0 && full_count == data->args.philo_count)
-			return ; // everyone finished
-		usleep(1000);
+			return ;
 	}
 
 }
@@ -33,11 +52,11 @@ void *philosopher_routine(void *arg)
 	t_philo *philo = (t_philo *)arg;
 
 	if (philo->id % 2 == 0)
-		usleep(1000);
+		usleep(300);
 	if (philo->data->args.philo_count == 1)
 	{
 		think_philo(philo);
-		usleep(philo->data->args.time_to_die);
+		ft_sleep(philo->data->args.time_to_die);
 		return (NULL);
 	}
 	while (!philo->data->someone_died)
@@ -75,11 +94,12 @@ int main (int argc, char **argv)
     philos = malloc(sizeof(t_philo) * args.philo_count);
     if (!philos)
         return (perror("malloc failed"), 1);
-    init_data(args, philos, &data);
+    init_data(args, &data);
 	setup_philos(&data, philos);
 	i = 0;
 	while (i < args.philo_count)
 	{
+		//u might want to add a check for all the philos to be ready before starting the smimulation
 		pthread_create(&philos[i].thread, NULL, philosopher_routine, &philos[i]);
 		i++;
 	}
