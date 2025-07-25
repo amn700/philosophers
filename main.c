@@ -14,7 +14,7 @@ void	ft_sleep(unsigned int milisec)
 				+ (current.tv_usec - start.tv_usec) / 1000;
 		if (elapsed >= milisec)
 			break;
-		usleep(50);  // Reduced for better responsiveness
+		ft_sleep(5);
 	}
 }
 
@@ -27,7 +27,7 @@ void	monitor_routine(t_data *data, t_philo *philos)
 
 	while (!data->someone_died)
 	{
-		usleep(100);  // Very frequent checking for tight timing
+		ft_sleep(10);
 		i = 0;
 		full_count = 0;
 		while (i < data->args.philo_count && !data->someone_died)
@@ -51,7 +51,7 @@ void *philosopher_routine(void *arg)
 	t_philo *philo = (t_philo *)arg;
 
 	if (philo->id % 2 == 0)
-		usleep(100);  // Reduced from 300 for faster startup
+		ft_sleep(10);
 	if (philo->data->args.philo_count == 1)
 	{
 		think_philo(philo);
@@ -61,18 +61,17 @@ void *philosopher_routine(void *arg)
 	while (!philo->data->someone_died)
 	{
 		think_philo(philo);
-		if (philo->data->someone_died) break;
-		
+		if (philo->data->someone_died)
+			break ;		
 		take_forks(philo);
-		if (philo->data->someone_died) break;
-		
+		if (philo->data->someone_died)
+			break ;		
 		eat_philo(philo);
-		release_forks(philo);  // Always release after eating
-		
+		release_forks(philo);
 		if (philo->data->args.must_eat_count != -1 && philo->times_eaten >= philo->data->args.must_eat_count)
 			return (NULL);
-		if (philo->data->someone_died) break;
-		
+		if (philo->data->someone_died)
+			break;
 		sleep_philo(philo);
 	}
 	return NULL;
