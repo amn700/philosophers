@@ -23,6 +23,7 @@ typedef struct s_data
 	long			start_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_lock;
+	pthread_mutex_t	meal_lock;
 	bool			ready_status;
 	int				someone_died;
 
@@ -52,7 +53,7 @@ void die_philo(t_philo *philo);
 
 bool    init_args(t_args *args, int argc, char **argv);
 void    init_philos(t_philo *philos, t_args args);
-void    init_data(t_args args, t_data *data);
+bool    init_data(t_args args, t_data *data);
 void setup_philos(t_data *data, t_philo *philos);
 
 void    take_forks(t_philo *philo);

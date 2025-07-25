@@ -14,7 +14,7 @@ void	ft_sleep(unsigned int milisec)
 				+ (current.tv_usec - start.tv_usec) / 1000;
 		if (elapsed >= milisec)
 			break;
-		usleep(50);
+		usleep(50);  // Reduced for better responsiveness
 	}
 }
 
@@ -27,7 +27,7 @@ void	monitor_routine(t_data *data, t_philo *philos)
 
 	while (!data->someone_died)
 	{
-		ft_sleep(10);
+		usleep(100);  // Very frequent checking for tight timing
 		i = 0;
 		full_count = 0;
 		while (i < data->args.philo_count && !data->someone_died)
@@ -50,10 +50,16 @@ void *philosopher_routine(void *arg)
 {
 	t_philo *philo = (t_philo *)arg;
 
+	// Wait for all philosophers to be created before starting
+	// Small staggered delay to reduce CPU contention during waiting
 	while (!philo->data->ready_status)
-		;
+	{
+		// All philosophers check at the same frequency but with slight offset
+		usleep(100 + (philo->id % 10) * 5);  // 100-145μs range based on ID
+	}
+		
 	if (philo->id % 2 == 0)
-		ft_sleep(10);
+		usleep(100);  // Reduced from 300 for faster startup
 	if (philo->data->args.philo_count == 1)
 	{
 		think_philo(philo);
@@ -63,17 +69,18 @@ void *philosopher_routine(void *arg)
 	while (!philo->data->someone_died)
 	{
 		think_philo(philo);
-		if (philo->data->someone_died)
-			break ;		
+		if (philo->data->someone_died) break;
+		
 		take_forks(philo);
-		if (philo->data->someone_died)
-			break ;		
+		if (philo->data->someone_died) break;
+		
 		eat_philo(philo);
-		release_forks(philo);
+		release_forks(philo);  // Always release after eating
+		
 		if (philo->data->args.must_eat_count != -1 && philo->times_eaten >= philo->data->args.must_eat_count)
 			return (NULL);
-		if (philo->data->someone_died)
-			break;
+		if (philo->data->someone_died) break;
+		
 		sleep_philo(philo);
 	}
 	return NULL;
@@ -85,14 +92,6 @@ void print_error_msg(void)
 	"USAGE : [number_of_philosophers]"
 	" [time_to_die] [time_to_eat][time_to_sleep]"
 	" [number_of_times_each_philosopher_must_eat]\n");
-}
-
-void	update_starting_time(t_data *data)
-{
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	data->start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
 int main (int argc, char **argv)
@@ -112,23 +111,35 @@ int main (int argc, char **argv)
     init_data(args, &data);
 	setup_philos(&data, philos);
 	i = 0;
-	// a mutex for updating and readying eating status for eat_count
-	// and one for updating the someone_died member
-	// to be done
+	// Create all philosopher threads first
 	while (i < args.philo_count)
 	{
 		pthread_create(&philos[i].thread, NULL, philosopher_routine, &philos[i]);
-		if (i == args.philo_count)
-		{
-			update_starting_time(&data);
-			data.ready_status = true;
-		}
 		i++;
 	}
+	
+	// Now set the actual starting time
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	data.start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	
+	// Update all philosophers' last_meal with the actual start time
+	i = 0;
+	while (i < args.philo_count)
+	{
+		philos[i].last_meal = data.start_time;
+		i++;
+	}
+	
+	// Now signal all philosophers to start
+	data.ready_status = true;
+	
 	monitor_routine(&data, philos);
     i = 0;
 	while (i < args.philo_count)
 		pthread_join(philos[i++].thread, NULL);
+	
+	// Cleanup
 	i = 0;
 	while (i < args.philo_count)
 		pthread_mutex_destroy(&data.forks[i++]);

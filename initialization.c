@@ -24,7 +24,7 @@ bool    init_args(t_args *args, int argc, char **argv)
 	return (true);
 }
 
-void    init_data(t_args args, t_data *data)
+bool    init_data(t_args args, t_data *data)
 {
 	int             i;
 
@@ -33,12 +33,14 @@ void    init_data(t_args args, t_data *data)
 	data->ready_status = false;
 	data->forks = malloc(sizeof(pthread_mutex_t) * args.philo_count);
 	if (!data->forks)
-		return (perror("malloc failed"));
+		return (perror("malloc failed"), false);
 	i = 0;
 	while (i < args.philo_count)
 		pthread_mutex_init(&data->forks[i++], NULL);
 	pthread_mutex_init(&data->print_lock, NULL);
+	pthread_mutex_init(&data->meal_lock, NULL);
 	data->someone_died = 0;
+	return (true);
 }
 
 void setup_philos(t_data *data, t_philo *philos)
