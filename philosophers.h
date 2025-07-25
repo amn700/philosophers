@@ -24,6 +24,7 @@ typedef struct s_data
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_lock;
 	pthread_mutex_t	meal_lock;
+	pthread_mutex_t	ready_mutex;
 	bool			ready_status;
 	int				someone_died;
 

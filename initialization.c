@@ -39,6 +39,8 @@ bool    init_data(t_args args, t_data *data)
 		pthread_mutex_init(&data->forks[i++], NULL);
 	pthread_mutex_init(&data->print_lock, NULL);
 	pthread_mutex_init(&data->meal_lock, NULL);
+	pthread_mutex_init(&data->ready_mutex, NULL);
+	pthread_mutex_lock(&data->ready_mutex);  // Start locked!
 	data->someone_died = 0;
 	return (true);
 }

@@ -51,12 +51,9 @@ void *philosopher_routine(void *arg)
 	t_philo *philo = (t_philo *)arg;
 
 	// Wait for all philosophers to be created before starting
-	// Small staggered delay to reduce CPU contention during waiting
-	while (!philo->data->ready_status)
-	{
-		// All philosophers check at the same frequency but with slight offset
-		usleep(100 + (philo->id % 10) * 5);  // 100-145μs range based on ID
-	}
+	// Block until ready_mutex is unlocked by main thread
+	pthread_mutex_lock(&philo->data->ready_mutex);
+	pthread_mutex_unlock(&philo->data->ready_mutex);  // Immediately unlock
 		
 	if (philo->id % 2 == 0)
 		usleep(100);  // Reduced from 300 for faster startup
@@ -131,8 +128,8 @@ int main (int argc, char **argv)
 		i++;
 	}
 	
-	// Now signal all philosophers to start
-	data.ready_status = true;
+	// Now signal all philosophers to start by unlocking the barrier
+	pthread_mutex_unlock(&data.ready_mutex);
 	
 	monitor_routine(&data, philos);
     i = 0;
@@ -144,6 +141,7 @@ int main (int argc, char **argv)
 	while (i < args.philo_count)
 		pthread_mutex_destroy(&data.forks[i++]);
 	pthread_mutex_destroy(&data.print_lock);
+	pthread_mutex_destroy(&data.ready_mutex);
 	free(data.forks);
 	free(philos);
 	return (0);
