@@ -23,7 +23,9 @@ typedef struct s_data
 	long			start_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_lock;
+	bool			ready_status;
 	int				someone_died;
+
 }				t_data;
 
 typedef struct s_philo

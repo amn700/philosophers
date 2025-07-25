@@ -14,7 +14,7 @@ void	ft_sleep(unsigned int milisec)
 				+ (current.tv_usec - start.tv_usec) / 1000;
 		if (elapsed >= milisec)
 			break;
-		ft_sleep(5);
+		usleep(50);
 	}
 }
 
@@ -50,6 +50,8 @@ void *philosopher_routine(void *arg)
 {
 	t_philo *philo = (t_philo *)arg;
 
+	while (!philo->data->ready_status)
+		;
 	if (philo->id % 2 == 0)
 		ft_sleep(10);
 	if (philo->data->args.philo_count == 1)
@@ -85,6 +87,14 @@ void print_error_msg(void)
 	" [number_of_times_each_philosopher_must_eat]\n");
 }
 
+void	update_starting_time(t_data *data)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	data->start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+
 int main (int argc, char **argv)
 {
     t_philo			*philos;
@@ -102,18 +112,23 @@ int main (int argc, char **argv)
     init_data(args, &data);
 	setup_philos(&data, philos);
 	i = 0;
+	// a mutex for updating and readying eating status for eat_count
+	// and one for updating the someone_died member
+	// to be done
 	while (i < args.philo_count)
 	{
-		//u might want to add a check for all the philos to be ready before starting the smimulation
 		pthread_create(&philos[i].thread, NULL, philosopher_routine, &philos[i]);
+		if (i == args.philo_count)
+		{
+			update_starting_time(&data);
+			data.ready_status = true;
+		}
 		i++;
 	}
 	monitor_routine(&data, philos);
     i = 0;
 	while (i < args.philo_count)
 		pthread_join(philos[i++].thread, NULL);
-	
-	// Cleanup
 	i = 0;
 	while (i < args.philo_count)
 		pthread_mutex_destroy(&data.forks[i++]);
