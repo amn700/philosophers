@@ -20,12 +20,11 @@ typedef struct s_args
 typedef struct s_data
 {
 	t_args			args;
-	long			start_time;
+	long long		start_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_lock;
 	pthread_mutex_t	meal_lock;
 	pthread_mutex_t	ready_mutex;
-	bool			ready_status;
 	int				someone_died;
 
 }				t_data;
@@ -34,16 +33,15 @@ typedef struct s_philo
 {
 	int				id;
 	int				times_eaten;
-	long			last_meal;
+	long long		last_meal;
 	pthread_t		thread;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*data;
-	long long thinking_start;
 }	                t_philo;
 
 void	ft_sleep(unsigned int milisec);
-long current_timestamp (void);
+long long current_timestamp (void);
 int     ft_atoi(char *str);
 
 void print_state(char *msg, t_philo *philo);
@@ -53,7 +51,6 @@ void sleep_philo(t_philo *philo);
 void die_philo(t_philo *philo);
 
 bool    init_args(t_args *args, int argc, char **argv);
-void    init_philos(t_philo *philos, t_args args);
 bool    init_data(t_args args, t_data *data);
 void setup_philos(t_data *data, t_philo *philos);
 

@@ -2,7 +2,7 @@
 
 void print_state(char *msg, t_philo *philo)
 {
-    long time_stamp;
+    long long time_stamp;
 
     if (philo->data->someone_died)
         return;
@@ -11,12 +11,12 @@ void print_state(char *msg, t_philo *philo)
     if (!philo->data->someone_died)
     {
         time_stamp = current_timestamp() - philo->data->start_time;
-        printf("%ld %d %s\n", time_stamp, philo->id, msg);
+        printf("%lld %d %s\n", time_stamp, philo->id, msg);
     }
     pthread_mutex_unlock(&philo->data->print_lock);
 }
 
-long current_timestamp (void)
+long long current_timestamp (void)
 {
     struct timeval tv;
     gettimeofday (&tv, NULL);
@@ -25,9 +25,12 @@ long current_timestamp (void)
 
 int     ft_atoi(char *str)
 {
-    int total = 0;
+    long total = 0;
     int sign = 1;
     int i = 0;
+    
+    if (!str)
+        return (0);
     while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
         i++;
     if (str[i] == '-' || str[i] == '+')
@@ -39,7 +42,10 @@ int     ft_atoi(char *str)
     while (str[i] && str[i] >= '0' && str[i] <= '9')
     {
         total = total * 10 + (str[i] - '0');
+        // Check for overflow
+        if (total > 2147483647)
+            return (sign == 1 ? 2147483647 : -2147483648);
         i++;
     }
-    return sign * total;
+    return (int)(sign * total);
 }

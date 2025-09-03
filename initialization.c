@@ -13,7 +13,9 @@ bool    init_args(t_args *args, int argc, char **argv)
 
 	if (args->philo_count <= 0)
 		return (printf("invalid number of philos\n"), false);
-	if (args->time_to_die < 0)
+	if (args->philo_count > 200)
+		return (printf("too many philosophers (max 200)\n"), false);
+	if (args->time_to_die <= 0)
 		return (printf("invalid number for time_to_die\n"), false);
 	if (args->time_to_eat < 0)
 		return (printf("invalid number for time_to_eat\n"), false);
@@ -30,7 +32,6 @@ bool    init_data(t_args args, t_data *data)
 
 	data->args = args;
 	data->start_time = 0;
-	data->ready_status = false;
 	data->forks = malloc(sizeof(pthread_mutex_t) * args.philo_count);
 	if (!data->forks)
 		return (perror("malloc failed"), false);

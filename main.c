@@ -33,10 +33,15 @@ void	monitor_routine(t_data *data, t_philo *philos)
 		while (i < data->args.philo_count && !data->someone_died)
 		{
 			now = current_timestamp();
+			
+			pthread_mutex_lock(&data->meal_lock);
 			diff = now - philos[i].last_meal;
+			int times_eaten = philos[i].times_eaten;
+			pthread_mutex_unlock(&data->meal_lock);
+			
 			if (diff > data->args.time_to_die)
 				return die_philo(&philos[i]);
-			if (data->args.must_eat_count > 0 && philos[i].times_eaten >= data->args.must_eat_count)
+			if (data->args.must_eat_count > 0 && times_eaten >= data->args.must_eat_count)
 				full_count++;
 			i++;
 		}
@@ -74,8 +79,14 @@ void *philosopher_routine(void *arg)
 		eat_philo(philo);
 		release_forks(philo);  // Always release after eating
 		
-		if (philo->data->args.must_eat_count != -1 && philo->times_eaten >= philo->data->args.must_eat_count)
-			return (NULL);
+		if (philo->data->args.must_eat_count != -1)
+		{
+			pthread_mutex_lock(&philo->data->meal_lock);
+			int times_eaten = philo->times_eaten;
+			pthread_mutex_unlock(&philo->data->meal_lock);
+			if (times_eaten >= philo->data->args.must_eat_count)
+				return (NULL);
+		}
 		if (philo->data->someone_died) break;
 		
 		sleep_philo(philo);
@@ -105,13 +116,36 @@ int main (int argc, char **argv)
     philos = malloc(sizeof(t_philo) * args.philo_count);
     if (!philos)
         return (perror("malloc failed"), 1);
-    init_data(args, &data);
+    if (!init_data(args, &data))
+	{
+		free(philos);
+		return (1);
+	}
 	setup_philos(&data, philos);
 	i = 0;
 	// Create all philosopher threads first
 	while (i < args.philo_count)
 	{
-		pthread_create(&philos[i].thread, NULL, philosopher_routine, &philos[i]);
+		if (pthread_create(&philos[i].thread, NULL, philosopher_routine, &philos[i]) != 0)
+		{
+			printf("Error: Failed to create thread for philosopher %d\n", i + 1);
+			data.someone_died = 1;  // Signal other threads to stop
+			// Wait for already created threads
+			int j = 0;
+			while (j < i)
+				pthread_join(philos[j++].thread, NULL);
+			// Cleanup
+			pthread_mutex_unlock(&data.ready_mutex);
+			j = 0;
+			while (j < args.philo_count)
+				pthread_mutex_destroy(&data.forks[j++]);
+			pthread_mutex_destroy(&data.print_lock);
+			pthread_mutex_destroy(&data.meal_lock);
+			pthread_mutex_destroy(&data.ready_mutex);
+			free(data.forks);
+			free(philos);
+			return (1);
+		}
 		i++;
 	}
 	
@@ -124,7 +158,9 @@ int main (int argc, char **argv)
 	i = 0;
 	while (i < args.philo_count)
 	{
+		pthread_mutex_lock(&data.meal_lock);
 		philos[i].last_meal = data.start_time;
+		pthread_mutex_unlock(&data.meal_lock);
 		i++;
 	}
 	
@@ -141,6 +177,7 @@ int main (int argc, char **argv)
 	while (i < args.philo_count)
 		pthread_mutex_destroy(&data.forks[i++]);
 	pthread_mutex_destroy(&data.print_lock);
+	pthread_mutex_destroy(&data.meal_lock);
 	pthread_mutex_destroy(&data.ready_mutex);
 	free(data.forks);
 	free(philos);
