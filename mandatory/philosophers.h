@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:25:05 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:07:41 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 12:12:09 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,5 +73,6 @@ void		release_forks(t_philo *philo);
 bool		launch_threads(t_args args, t_data data, t_philo *philos);
 void		monitor_routine(t_data *data, t_philo *philos);
 void		start_simulation(t_data *data, t_philo *philos, t_args *args);
-void		cleanup(t_data *data, t_philo *philos, int philo_count, t_args *args);
+void		cleanup(t_data *data, t_philo *philos,
+				int philo_count, t_args *args);
 #endif

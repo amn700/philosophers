@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routines.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:50:39 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:07:43 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 12:11:39 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	monitor_core(t_data *data, t_philo *philos, int *full_count)
 	int			times_eaten;
 
 	i = 0;
-	while (i < data->args.philo_count && !check_death_unsafe(data))
+	while (i < data->args.philo_count && !check_death(philos))
 	{
 		now = current_timestamp();
 		pthread_mutex_lock(&data->meal_lock);
@@ -40,7 +40,7 @@ void	monitor_routine(t_data *data, t_philo *philos)
 {
 	int			full_count;
 
-	while (!check_death_unsafe(data))
+	while (!check_death(philos))
 	{
 		full_count = 0;
 		monitor_core(data, philos, &full_count);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:44 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:07:40 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 12:14:25 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,6 @@ int	main(int argc, char **argv)
 	t_philo	*philos;
 	t_args	args;
 	t_data	data;
-	int		i;
-	int		status;
 
 	if (argc != 5 && argc != 6)
 		return (print_error_msg(), 1);
@@ -118,21 +116,7 @@ int	main(int argc, char **argv)
 	setup_philos(&data, philos);
 	data.start_time = current_timestamp();
 	multy_process_management(&data, philos, &args);
-	
-	// Wait for first child to exit (death or completion)
-	if (waitpid(-1, &status, 0) > 0)
-	{
-		// Kill all remaining children
-		i = 0;
-		while (i < args.philo_count)
-		{
-			kill(data.philosophers[i], SIGTERM);
-			i++;
-		}
-		// Wait for all children to terminate
-		while (waitpid(-1, &status, 0) > 0)
-			;
-	}
+	wait_for_processes(args, data);
 	cleanup(&data, philos);
 	return (0);
 }

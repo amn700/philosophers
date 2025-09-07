@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:47 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:07:43 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 12:14:56 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,4 +69,5 @@ void		sleep_philo(t_philo *philo);
 void		die_philo(t_philo *philo);
 void		print_state(char *state, t_philo *philo);
 void		cleanup(t_data *data, t_philo *philos);
+void		wait_for_processes(t_args args, t_data data);
 #endif

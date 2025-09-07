@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   helper_func1.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:55 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:07:43 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 12:11:47 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,6 @@ void	set_death(t_philo *philo)
 	pthread_mutex_lock(&philo->data->death_lock);
 	philo->data->someone_died = 1;
 	pthread_mutex_unlock(&philo->data->death_lock);
-}
-
-int	check_death_unsafe(t_data *data)
-{
-	return (data->someone_died);
 }
 
 long long	current_timestamp(void)

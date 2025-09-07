@@ -6,11 +6,29 @@
 /*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:50 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:57:13 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 12:14:42 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
+
+void	wait_for_processes(t_args args, t_data data)
+{
+	int	i;
+	int	status;
+
+	if (waitpid(-1, &status, 0) > 0)
+	{
+		i = 0;
+		while (i < args.philo_count)
+		{
+			kill(data.philosophers[i], SIGTERM);
+			i++;
+		}
+		while (waitpid(-1, &status, 0) > 0)
+			;
+	}
+}
 
 void	*death_monitor(void *arg)
 {
