@@ -3,23 +3,20 @@ NAME = philo_bonus
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread -O2 -march=native
 
-SRCDIR = .
-OBJDIR = .
+SRCS = main_bonus.c actions_bonus.c helper_bonus.c routines_bonus.c
+OBJS = $(SRCS:.c=.o)
 
-SOURCES = main_bonus.c actions_bonus.c routines_bonus.c helper_bonus.c
-
-OBJECTS = $(SOURCES:%.c=$(OBJDIR)/%.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJECTS)
-	@$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME)
+$(NAME): $(OBJS)
+	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
+%.o: %.c philosophers_bonus.h
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	@rm -f $(OBJECTS)
+	@rm -f $(OBJS)
 
 fclean: clean
 	@rm -f $(NAME)

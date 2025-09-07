@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:25:05 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 12:12:09 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 16:27:48 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ typedef struct s_data
 	pthread_mutex_t	death_lock;
 	pthread_mutex_t	ready_mutex;
 	int				someone_died;
+	int				simulation_complete;
 
 }				t_data;
 
@@ -63,6 +64,7 @@ void		eat_philo(t_philo *philo);
 void		sleep_philo(t_philo *philo);
 int			check_death(t_philo *philo);
 int			check_death_unsafe(t_data *data);
+int			check_simulation_complete(t_philo *philo);
 void		set_death(t_philo *philo);
 void		die_philo(t_philo *philo);
 bool		init_args(t_args *args, int argc, char **argv);

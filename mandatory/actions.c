@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   actions.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:52 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 10:51:14 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 16:27:48 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	take_forks(t_philo *philo)
 {
-	if (check_death(philo))
+	if (check_death(philo) || check_simulation_complete(philo))
 		return ;
 	if (philo->id % 2 == 0)
 	{
@@ -48,7 +48,7 @@ void	release_forks(t_philo *philo)
 
 void	think_philo(t_philo *philo)
 {
-	if (check_death(philo))
+	if (check_death(philo) || check_simulation_complete(philo))
 		return ;
 	print_state("is thinking", philo);
 	return ;
@@ -56,7 +56,7 @@ void	think_philo(t_philo *philo)
 
 void	eat_philo(t_philo *philo)
 {
-	if (check_death(philo))
+	if (check_death(philo) || check_simulation_complete(philo))
 		return ;
 	pthread_mutex_lock(&philo->data->meal_lock);
 	philo->last_meal = current_timestamp();
@@ -69,7 +69,7 @@ void	eat_philo(t_philo *philo)
 
 void	sleep_philo(t_philo *philo)
 {
-	if (check_death(philo))
+	if (check_death(philo) || check_simulation_complete(philo))
 		return ;
 	print_state("is sleeping", philo);
 	ft_sleep(philo->data->args.time_to_sleep);

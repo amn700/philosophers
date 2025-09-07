@@ -1,4 +1,21 @@
-/* ************************************************************************** */
+/* *************************************void	start_simulation(t_data *data, t_philo *philos, t_args *args)
+{
+	struct timeval	tv;
+	int				i;
+
+	gettimeofday(&tv, NULL);
+	// Add buffer time for all threads to start properly
+	data->start_time = (tv.tv_sec * 1000 + tv.tv_usec / 1000) + (args->philo_count * 20);
+	i = 0;
+	while (i < args->philo_count)
+	{
+		pthread_mutex_lock(&data->meal_lock);
+		philos[i].last_meal = data->start_time;
+		pthread_mutex_unlock(&data->meal_lock);
+		i++;
+	}
+	pthread_mutex_unlock(&data->ready_mutex);
+}******************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
@@ -26,7 +43,7 @@ void	ft_sleep(unsigned int milisec)
 			+ (current.tv_usec - start.tv_usec) / 1000;
 		if (elapsed >= milisec)
 			break ;
-		usleep(50);
+		usleep(100);
 	}
 }
 
@@ -88,7 +105,7 @@ int	main(int argc, char **argv)
 		return (1);
 	philos = malloc(sizeof(t_philo) * args.philo_count);
 	if (!philos)
-		return (perror("malloc failed"), 1);
+		return (printf("malloc failed\n"), 1);
 	if (!init_data(args, &data))
 		return (free(philos), 1);
 	setup_philos(&data, philos);

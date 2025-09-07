@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   initialization.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:57 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 10:51:40 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 16:27:48 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ bool	init_data(t_args args, t_data *data)
 	pthread_mutex_init(&data->ready_mutex, NULL);
 	pthread_mutex_lock(&data->ready_mutex);
 	data->someone_died = 0;
+	data->simulation_complete = 0;
 	return (true);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   helper_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:42 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:56:08 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 13:41:09 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	ft_sleep(unsigned int milisec)
 			+ (current.tv_usec - start.tv_usec) / 1000;
 		if (elapsed >= milisec)
 			break ;
-		usleep(50);
+		usleep(100);
 	}
 }
 
