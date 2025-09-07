@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:42 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 18:29:34 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 21:13:15 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,6 @@ int	ft_atoi(char *str)
 
 void	print_state(char *state, t_philo *philo)
 {
-	long long	timestamp;
-
 	pthread_mutex_lock(&philo->meal_mutex);
 	if (philo->should_stop)
 	{
@@ -76,28 +74,30 @@ void	print_state(char *state, t_philo *philo)
 		return ;
 	}
 	pthread_mutex_unlock(&philo->meal_mutex);
-		
+	if (check_death_status(philo))
+		return ;
 	sem_wait(philo->data->writing);
-	
-	// Double check after acquiring semaphore with mutex protection
 	pthread_mutex_lock(&philo->meal_mutex);
 	if (!philo->should_stop)
 	{
 		pthread_mutex_unlock(&philo->meal_mutex);
-		timestamp = current_timestamp() - philo->data->start_time;
-		printf("%lld %d %s\n", timestamp, philo->id, state);
+		if (check_death_status(philo))
+		{
+			sem_post(philo->data->writing);
+			return ;
+		}
+		printf("%lld %d %s\n", current_timestamp() - philo->data->start_time,
+			philo->id, state);
 	}
 	else
-	{
 		pthread_mutex_unlock(&philo->meal_mutex);
-	}
 	sem_post(philo->data->writing);
 }
 
 void	print_error_msg(void)
 {
-	printf("invalid number of arguments\n"
-		"USAGE : [number_of_philosophers]"
-		" [time_to_die] [time_to_eat][time_to_sleep]"
-		" [number_of_times_each_philosopher_must_eat]\n");
+	printf("invalid number of arguments\n");
+	printf("USAGE : [number_of_philosophers] [time_to_die] ");
+	printf("[time_to_eat] [time_to_sleep] ");
+	printf("[number_of_times_each_philosopher_must_eat]\n");
 }

@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:44 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 18:29:34 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 20:47:30 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ bool	init_data(t_args args, t_data *data)
 	sem_unlink("/writing_sem");
 	sem_unlink("/death_check_sem");
 	sem_unlink("/death_print_sem");
-	sem_unlink("/meal_complete_sem");
 	data->forks = sem_open("/forks_sem", O_CREAT, 0644, args.philo_count);
 	if (data->forks == SEM_FAILED)
 		return (printf("sem_open failed for forks\n"), false);
@@ -61,9 +60,6 @@ bool	init_data(t_args args, t_data *data)
 	data->death_print = sem_open("/death_print_sem", O_CREAT, 0644, 1);
 	if (data->death_print == SEM_FAILED)
 		return (printf("sem_open failed for death_print\n"), false);
-	data->meal_complete = sem_open("/meal_complete_sem", O_CREAT, 0644, 0);
-	if (data->meal_complete == SEM_FAILED)
-		return (printf("sem_open failed for meal_complete\n"), false);
 	return (true);
 }
 

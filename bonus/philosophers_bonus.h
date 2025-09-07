@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:47 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 12:14:56 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 21:04:08 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,27 +42,32 @@ typedef struct s_data
 	sem_t		*writing;
 	sem_t		*death_check;
 	sem_t		*death_print;
-	sem_t		*meal_complete;
 	pid_t		*philosophers;
 }				t_data;
 
 typedef struct s_philo
 {
-	int			id;
-	long long	last_meal;
-	int			meals_eaten;
-	int			should_stop;
-	pid_t		pid;
+	int				id;
+	long long		last_meal;
+	int				meals_eaten;
+	int				should_stop;
+	pid_t			pid;
 	pthread_mutex_t	meal_mutex;
-	t_data		*data;
+	t_data			*data;
 }				t_philo;
 
 long long	current_timestamp(void);
 void		ft_sleep(unsigned int milisec);
 int			ft_atoi(char *str);
 void		print_error_msg(void);
+int			check_death_status(t_philo *philo);
 void		*death_monitor(void *arg);
 void		philosopher_routine(t_philo *philo);
+void		single_philo_routine(t_philo *philo);
+int			check_stop_condition(t_philo *philo);
+void		execute_philosopher_cycle(t_philo *philo);
+int			check_meal_completion(t_philo *philo);
+int			check_death_condition(t_philo *philo, long long current_time);
 void		think_philo(t_philo *philo);
 void		take_forks(t_philo *philo);
 void		eat_philo(t_philo *philo);
