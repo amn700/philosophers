@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   helper_func1.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:55 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 16:27:48 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 17:36:14 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,15 @@
 void	print_state(char *msg, t_philo *philo)
 {
 	long long	time_stamp;
+	int			died;
+	int			complete;
 
+	pthread_mutex_lock(&philo->data->death_lock);
+	died = philo->data->someone_died;
+	complete = philo->data->simulation_complete;
+	pthread_mutex_unlock(&philo->data->death_lock);
 	pthread_mutex_lock(&philo->data->print_lock);
-	if (!philo->data->someone_died && !philo->data->simulation_complete)
+	if (!died && !complete)
 	{
 		time_stamp = current_timestamp() - philo->data->start_time;
 		printf("%lld %d %s\n", time_stamp, philo->id, msg);

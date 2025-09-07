@@ -1,7 +1,7 @@
 NAME = philo_bonus
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread -O2 -march=native
+CFLAGS = -Wall -Wextra -Werror -fsanitize=thread#-pthread -O2 -march=native
 
 SRCS = main_bonus.c actions_bonus.c helper_bonus.c routines_bonus.c
 OBJS = $(SRCS:.c=.o)

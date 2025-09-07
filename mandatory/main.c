@@ -77,7 +77,9 @@ void	cleanup(t_data *data, t_philo *philos, int created_count, t_args *args)
 {
 	int	i;
 
+	pthread_mutex_lock(&data->death_lock);
 	data->someone_died = 1;
+	pthread_mutex_unlock(&data->death_lock);
 	i = 0;
 	while (i < created_count)
 		pthread_join(philos[i++].thread, NULL);
