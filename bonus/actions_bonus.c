@@ -33,8 +33,10 @@ void	think_philo(t_philo *philo)
 
 void	eat_philo(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->meal_mutex);
 	philo->last_meal = current_timestamp();
 	philo->meals_eaten += 1;
+	pthread_mutex_unlock(&philo->meal_mutex);
 	print_state("is eating", philo);
 	ft_sleep(philo->data->args.time_to_eat);
 }

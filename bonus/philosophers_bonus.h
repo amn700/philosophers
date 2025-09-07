@@ -52,6 +52,7 @@ typedef struct s_philo
 	int			meals_eaten;
 	int			should_stop;
 	pid_t		pid;
+	pthread_mutex_t	meal_mutex;
 	t_data		*data;
 }				t_philo;
 

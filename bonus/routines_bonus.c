@@ -34,17 +34,22 @@ void	*death_monitor(void *arg)
 {
 	t_philo		*philo;
 	long long	current_time;
+	long long	last_meal_time;
 
 	philo = (t_philo *)arg;
 	while (!philo->should_stop)
 	{
 		current_time = current_timestamp();
-		if (current_time - philo->last_meal > philo->data->args.time_to_die)
+		pthread_mutex_lock(&philo->meal_mutex);
+		last_meal_time = philo->last_meal;
+		pthread_mutex_unlock(&philo->meal_mutex);
+		
+		if (current_time - last_meal_time > philo->data->args.time_to_die)
 		{
 			die_philo(philo);
 			return (NULL);
 		}
-		// usleep(500);
+		usleep(500);
 	}
 	return (NULL);
 }
@@ -54,8 +59,6 @@ void	philosopher_routine(t_philo *philo)
 	pthread_t	monitor_thread;
 
 	philo->should_stop = 0;
-	if (pthread_create(&monitor_thread, NULL, death_monitor, philo) != 0)
-		return (printf("pthread_create failed\n"), exit(1));
 	
 	// Special case for single philosopher - just think and die
 	if (philo->data->args.philo_count == 1)
@@ -63,13 +66,12 @@ void	philosopher_routine(t_philo *philo)
 		sem_wait(philo->data->writing);
 		printf("0 %d is thinking\n", philo->id);
 		sem_post(philo->data->writing);
-		ft_sleep(philo->data->args.time_to_die);
-		sem_wait(philo->data->death_print);
-		sem_wait(philo->data->writing);
-		printf("%d %d died\n", philo->data->args.time_to_die, philo->id);
-		sem_post(philo->data->writing);
-		exit(1);
+		ft_sleep(philo->data->args.time_to_die + 1);
+		exit(0);
 	}
+	
+	if (pthread_create(&monitor_thread, NULL, death_monitor, philo) != 0)
+		return (printf("pthread_create failed\n"), exit(1));
 	
 	while (!philo->should_stop)
 	{
@@ -102,18 +104,4 @@ void	die_philo(t_philo *philo)
 	printf("%lld %d died\n", timestamp, philo->id);
 	sem_post(philo->data->writing);
 	exit(1);
-}
-
-void	cleanup(t_data *data, t_philo *philos)
-{
-	sem_close(data->forks);
-	sem_close(data->writing);
-	sem_close(data->death_check);
-	sem_close(data->death_print);
-	sem_unlink("/forks_sem");
-	sem_unlink("/writing_sem");
-	sem_unlink("/death_check_sem");
-	sem_unlink("/death_print_sem");
-	free(data->philosophers);
-	free(philos);
 }

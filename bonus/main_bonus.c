@@ -63,6 +63,28 @@ bool	init_data(t_args args, t_data *data)
 	return (true);
 }
 
+void	cleanup(t_data *data, t_philo *philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->args.philo_count)
+	{
+		pthread_mutex_destroy(&philos[i].meal_mutex);
+		i++;
+	}
+	sem_close(data->forks);
+	sem_close(data->writing);
+	sem_close(data->death_check);
+	sem_close(data->death_print);
+	sem_unlink("/forks_sem");
+	sem_unlink("/writing_sem");
+	sem_unlink("/death_check_sem");
+	sem_unlink("/death_print_sem");
+	free(data->philosophers);
+	free(philos);
+}
+
 void	setup_philos(t_data *data, t_philo *philos)
 {
 	int	i;
@@ -75,6 +97,11 @@ void	setup_philos(t_data *data, t_philo *philos)
 		philos[i].meals_eaten = 0;
 		philos[i].should_stop = 0;
 		philos[i].data = data;
+		if (pthread_mutex_init(&philos[i].meal_mutex, NULL) != 0)
+		{
+			printf("Failed to initialize meal mutex\n");
+			exit(1);
+		}
 		i++;
 	}
 }
