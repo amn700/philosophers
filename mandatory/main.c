@@ -1,29 +1,12 @@
-/* *************************************void	start_simulation(t_data *data, t_philo *philos, t_args *args)
-{
-	struct timeval	tv;
-	int				i;
-
-	gettimeofday(&tv, NULL);
-	// Add buffer time for all threads to start properly
-	data->start_time = (tv.tv_sec * 1000 + tv.tv_usec / 1000) + (args->philo_count * 20);
-	i = 0;
-	while (i < args->philo_count)
-	{
-		pthread_mutex_lock(&data->meal_lock);
-		philos[i].last_meal = data->start_time;
-		pthread_mutex_unlock(&data->meal_lock);
-		i++;
-	}
-	pthread_mutex_unlock(&data->ready_mutex);
-}******************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/07 08:25:00 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:07:42 by codespace        ###   ########.fr       */
+/*   Created: 2025/09/07 20:52:50 by mohchaib          #+#    #+#             */
+/*   Updated: 2025/09/07 20:52:51 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   helper_func1.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:55 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 17:09:58 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 20:53:35 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,29 +64,4 @@ long long	current_timestamp(void)
 
 	gettimeofday (&tv, NULL);
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
-}
-
-int	ft_atoi(char *str)
-{
-	long	total;
-	int		sign;
-
-	total = 0;
-	sign = 1;
-	if (!str)
-		return (0);
-	while (*str == 32 || (*str >= 9 && *str <= 13))
-		str++;
-	if (*str == '-' || *str == '+')
-	{
-		if (*str == '-')
-			sign = -sign;
-		str++;
-	}
-	while (*str && *str >= '0' && *str <= '9')
-	{
-		total = total * 10 + (*str - '0');
-		str++;
-	}
-	return ((int)(sign * total));
 }

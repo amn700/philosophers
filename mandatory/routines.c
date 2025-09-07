@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routines.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:50:39 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 16:27:48 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 20:55:19 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,10 @@ void	monitor_core(t_data *data, t_philo *philos, int *full_count)
 
 void	monitor_routine(t_data *data, t_philo *philos)
 {
-	int			full_count;
+	int	full_count;
 
-	// Wait for start time
 	while (current_timestamp() < data->start_time)
 		continue ;
-		
 	while (!check_death(philos))
 	{
 		full_count = 0;
@@ -114,11 +112,8 @@ void	*philosopher_routine(void *arg)
 	philo = (t_philo *)arg;
 	pthread_mutex_lock(&philo->data->ready_mutex);
 	pthread_mutex_unlock(&philo->data->ready_mutex);
-	
-	// Wait for start time
 	while (current_timestamp() < philo->data->start_time)
 		usleep(100);
-	
 	one_philo_routine(philo);
 	if (philo->id % 2 == 1)
 		usleep(1000);
