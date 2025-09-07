@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:47 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 17:17:39 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 12:14:56 by mohchaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_data
 	sem_t		*writing;
 	sem_t		*death_check;
 	sem_t		*death_print;
+	sem_t		*meal_complete;
 	pid_t		*philosophers;
 }				t_data;
 
@@ -53,7 +54,6 @@ typedef struct s_philo
 	int			should_stop;
 	pid_t		pid;
 	pthread_mutex_t	meal_mutex;
-	pthread_mutex_t	stop_mutex;
 	t_data		*data;
 }				t_philo;
 

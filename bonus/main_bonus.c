@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:44 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 17:31:39 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 18:29:34 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ bool	init_data(t_args args, t_data *data)
 	sem_unlink("/writing_sem");
 	sem_unlink("/death_check_sem");
 	sem_unlink("/death_print_sem");
+	sem_unlink("/meal_complete_sem");
 	data->forks = sem_open("/forks_sem", O_CREAT, 0644, args.philo_count);
 	if (data->forks == SEM_FAILED)
 		return (printf("sem_open failed for forks\n"), false);
@@ -60,30 +61,10 @@ bool	init_data(t_args args, t_data *data)
 	data->death_print = sem_open("/death_print_sem", O_CREAT, 0644, 1);
 	if (data->death_print == SEM_FAILED)
 		return (printf("sem_open failed for death_print\n"), false);
+	data->meal_complete = sem_open("/meal_complete_sem", O_CREAT, 0644, 0);
+	if (data->meal_complete == SEM_FAILED)
+		return (printf("sem_open failed for meal_complete\n"), false);
 	return (true);
-}
-
-void	cleanup(t_data *data, t_philo *philos)
-{
-	int	i;
-
-	i = 0;
-	while (i < data->args.philo_count)
-	{
-		pthread_mutex_destroy(&philos[i].meal_mutex);
-		pthread_mutex_destroy(&philos[i].stop_mutex);
-		i++;
-	}
-	sem_close(data->forks);
-	sem_close(data->writing);
-	sem_close(data->death_check);
-	sem_close(data->death_print);
-	sem_unlink("/forks_sem");
-	sem_unlink("/writing_sem");
-	sem_unlink("/death_check_sem");
-	sem_unlink("/death_print_sem");
-	free(data->philosophers);
-	free(philos);
 }
 
 void	setup_philos(t_data *data, t_philo *philos)
@@ -94,18 +75,13 @@ void	setup_philos(t_data *data, t_philo *philos)
 	while (i < data->args.philo_count)
 	{
 		philos[i].id = i + 1;
-		philos[i].last_meal = current_timestamp();
+		philos[i].last_meal = 0;
 		philos[i].meals_eaten = 0;
 		philos[i].should_stop = 0;
 		philos[i].data = data;
 		if (pthread_mutex_init(&philos[i].meal_mutex, NULL) != 0)
 		{
 			printf("Failed to initialize meal mutex\n");
-			exit(1);
-		}
-		if (pthread_mutex_init(&philos[i].stop_mutex, NULL) != 0)
-		{
-			printf("Failed to initialize stop mutex\n");
 			exit(1);
 		}
 		i++;
@@ -117,7 +93,6 @@ void	multy_process_management(t_data *data, t_philo *philos, t_args *args)
 	int	i;
 
 	i = 0;
-	data->start_time = current_timestamp();
 	while (i < args->philo_count)
 	{
 		data->philosophers[i] = fork();

@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:42 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 17:09:58 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 18:29:34 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,28 @@ void	print_state(char *state, t_philo *philo)
 {
 	long long	timestamp;
 
+	pthread_mutex_lock(&philo->meal_mutex);
+	if (philo->should_stop)
+	{
+		pthread_mutex_unlock(&philo->meal_mutex);
+		return ;
+	}
+	pthread_mutex_unlock(&philo->meal_mutex);
+		
 	sem_wait(philo->data->writing);
-	timestamp = current_timestamp() - philo->data->start_time;
-	printf("%lld %d %s\n", timestamp, philo->id, state);
+	
+	// Double check after acquiring semaphore with mutex protection
+	pthread_mutex_lock(&philo->meal_mutex);
+	if (!philo->should_stop)
+	{
+		pthread_mutex_unlock(&philo->meal_mutex);
+		timestamp = current_timestamp() - philo->data->start_time;
+		printf("%lld %d %s\n", timestamp, philo->id, state);
+	}
+	else
+	{
+		pthread_mutex_unlock(&philo->meal_mutex);
+	}
 	sem_post(philo->data->writing);
 }
 
