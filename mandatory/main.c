@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:25:00 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 10:51:35 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 11:07:42 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ void	cleanup(t_data *data, t_philo *philos, int created_count, t_args *args)
 {
 	int	i;
 
-	printf("Error: Failed to create thread for philosopher %d\n", i + 1);
 	data->someone_died = 1;
 	i = 0;
 	while (i < created_count)

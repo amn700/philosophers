@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:47 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 11:53:38 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 11:07:43 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,5 @@ void		release_forks(t_philo *philo);
 void		sleep_philo(t_philo *philo);
 void		die_philo(t_philo *philo);
 void		print_state(char *state, t_philo *philo);
+void		cleanup(t_data *data, t_philo *philos);
 #endif

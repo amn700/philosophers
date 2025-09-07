@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routines.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:50:39 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 10:50:46 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 11:07:43 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,6 @@ void	one_philo_routine(t_philo *philo)
 
 int	philosopher_core(t_philo	*philo)
 {
-	int		times_eaten;
-
 	think_philo(philo);
 	if (check_death(philo))
 		return (1);
@@ -76,10 +74,12 @@ int	philosopher_core(t_philo	*philo)
 	if (philo->data->args.must_eat_count != -1)
 	{
 		pthread_mutex_lock(&philo->data->meal_lock);
-		times_eaten = philo->times_eaten;
-		pthread_mutex_unlock(&philo->data->meal_lock);
 		if (philo->times_eaten >= philo->data->args.must_eat_count)
+		{
+			pthread_mutex_unlock(&philo->data->meal_lock);
 			return (1);
+		}
+		pthread_mutex_unlock(&philo->data->meal_lock);
 	}
 	if (check_death(philo))
 		return (1);

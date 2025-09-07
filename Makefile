@@ -62,14 +62,14 @@ bonus:
 
 
 clean:
-	@echo "$(YELLOW)Cleaning object files...$(RESET)"
+	@echo "$(RED)Cleaning object files...$(RESET)"
 	@$(MAKE) -C $(MANDATORY_DIR) clean
 	@$(MAKE) -C $(BONUS_DIR) clean
 	@echo "$(GREEN)✓ Object files cleaned!$(RESET)"
 
 
 fclean:
-	@echo "$(YELLOW)Cleaning everything...$(RESET)"
+	@echo "$(RED)Cleaning everything...$(RESET)"
 	@$(MAKE) -C $(MANDATORY_DIR) fclean
 	@$(MAKE) -C $(BONUS_DIR) fclean
 	@echo "$(GREEN)✓ Everything cleaned!$(RESET)"
