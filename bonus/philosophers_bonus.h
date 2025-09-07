@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:47 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 17:09:58 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 17:17:39 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ typedef struct s_philo
 	int			should_stop;
 	pid_t		pid;
 	pthread_mutex_t	meal_mutex;
+	pthread_mutex_t	stop_mutex;
 	t_data		*data;
 }				t_philo;
 

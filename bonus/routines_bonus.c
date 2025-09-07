@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:50 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 17:09:58 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 17:17:39 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,18 +60,24 @@ void	philosopher_routine(t_philo *philo)
 
 	philo->should_stop = 0;
 	
-	// Special case for single philosopher - just think and die
+	if (pthread_create(&monitor_thread, NULL, death_monitor, philo) != 0)
+		return (printf("pthread_create failed\n"), exit(1));
+	
+	// Special case for single philosopher - just think and wait to die
 	if (philo->data->args.philo_count == 1)
 	{
 		sem_wait(philo->data->writing);
 		printf("0 %d is thinking\n", philo->id);
 		sem_post(philo->data->writing);
-		ft_sleep(philo->data->args.time_to_die + 1);
+		
+		// Single philosopher can't eat (needs 2 forks, only 1 available)
+		// So just wait to die without taking any forks
+		while (!philo->should_stop)
+			usleep(1000);
+		
+		pthread_join(monitor_thread, NULL);
 		exit(0);
 	}
-	
-	if (pthread_create(&monitor_thread, NULL, death_monitor, philo) != 0)
-		return (printf("pthread_create failed\n"), exit(1));
 	
 	while (!philo->should_stop)
 	{
