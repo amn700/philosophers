@@ -15,12 +15,12 @@ bool    init_args(t_args *args, int argc, char **argv)
 		return (printf("invalid number of philos\n"), false);
 	if (args->philo_count > 200)
 		return (printf("too many philosophers (max 200)\n"), false);
-	if (args->time_to_die <= 0)
-		return (printf("invalid number for time_to_die\n"), false);
-	if (args->time_to_eat < 0)
-		return (printf("invalid number for time_to_eat\n"), false);
-	if (args->time_to_sleep < 0)
-		return (printf("invalid number for time_to_sleep\n"), false);
+	if (args->time_to_die < 60)
+		return (printf("time_to_die must be at least 60ms\n"), false);
+	if (args->time_to_eat < 60)
+		return (printf("time_to_eat must be at least 60ms\n"), false);
+	if (args->time_to_sleep < 60)
+		return (printf("time_to_sleep must be at least 60ms\n"), false);
 	if (argc == 6 && args->must_eat_count < 0)
 		return (printf("invalid number for must_eat_count\n"), false);
 	return (true);
@@ -40,6 +40,7 @@ bool    init_data(t_args args, t_data *data)
 		pthread_mutex_init(&data->forks[i++], NULL);
 	pthread_mutex_init(&data->print_lock, NULL);
 	pthread_mutex_init(&data->meal_lock, NULL);
+	pthread_mutex_init(&data->death_lock, NULL);
 	pthread_mutex_init(&data->ready_mutex, NULL);
 	pthread_mutex_lock(&data->ready_mutex);  // Start locked!
 	data->someone_died = 0;

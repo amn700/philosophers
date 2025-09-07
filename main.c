@@ -25,12 +25,12 @@ void	monitor_routine(t_data *data, t_philo *philos)
     int			i;
 	int 		full_count;
 
-	while (!data->someone_died)
+	while (!check_death_unsafe(data))
 	{
 		usleep(100);  // Very frequent checking for tight timing
 		i = 0;
 		full_count = 0;
-		while (i < data->args.philo_count && !data->someone_died)
+		while (i < data->args.philo_count && !check_death_unsafe(data))
 		{
 			now = current_timestamp();
 			
@@ -68,13 +68,13 @@ void *philosopher_routine(void *arg)
 		ft_sleep(philo->data->args.time_to_die);
 		return (NULL);
 	}
-	while (!philo->data->someone_died)
+	while (!check_death(philo))
 	{
 		think_philo(philo);
-		if (philo->data->someone_died) break;
+		if (check_death(philo)) break;
 		
 		take_forks(philo);
-		if (philo->data->someone_died) break;
+		if (check_death(philo)) break;
 		
 		eat_philo(philo);
 		release_forks(philo);  // Always release after eating
@@ -87,7 +87,7 @@ void *philosopher_routine(void *arg)
 			if (times_eaten >= philo->data->args.must_eat_count)
 				return (NULL);
 		}
-		if (philo->data->someone_died) break;
+		if (check_death(philo)) break;
 		
 		sleep_philo(philo);
 	}
@@ -141,6 +141,7 @@ int main (int argc, char **argv)
 				pthread_mutex_destroy(&data.forks[j++]);
 			pthread_mutex_destroy(&data.print_lock);
 			pthread_mutex_destroy(&data.meal_lock);
+			pthread_mutex_destroy(&data.death_lock);
 			pthread_mutex_destroy(&data.ready_mutex);
 			free(data.forks);
 			free(philos);
@@ -178,6 +179,7 @@ int main (int argc, char **argv)
 		pthread_mutex_destroy(&data.forks[i++]);
 	pthread_mutex_destroy(&data.print_lock);
 	pthread_mutex_destroy(&data.meal_lock);
+	pthread_mutex_destroy(&data.death_lock);
 	pthread_mutex_destroy(&data.ready_mutex);
 	free(data.forks);
 	free(philos);

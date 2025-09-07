@@ -3,13 +3,13 @@
 void take_forks(t_philo *philo)
 {
     // Quick death check before attempting to take forks
-    if (philo->data->someone_died)
+    if (check_death(philo))
         return;
         
     if (philo->id % 2 == 0)
     {
         pthread_mutex_lock(philo->right_fork);
-        if (philo->data->someone_died)
+        if (check_death(philo))
         {
             pthread_mutex_unlock(philo->right_fork);
             return;
@@ -17,7 +17,7 @@ void take_forks(t_philo *philo)
         print_state("has taken a fork", philo);
         
         pthread_mutex_lock(philo->left_fork);
-        if (philo->data->someone_died)
+        if (check_death(philo))
         {
             pthread_mutex_unlock(philo->left_fork);
             pthread_mutex_unlock(philo->right_fork);
@@ -28,7 +28,7 @@ void take_forks(t_philo *philo)
     else
     {
         pthread_mutex_lock(philo->left_fork);
-        if (philo->data->someone_died)
+        if (check_death(philo))
         {
             pthread_mutex_unlock(philo->left_fork);
             return;
@@ -36,7 +36,7 @@ void take_forks(t_philo *philo)
         print_state("has taken a fork", philo);
         
         pthread_mutex_lock(philo->right_fork);
-        if (philo->data->someone_died)
+        if (check_death(philo))
         {
             pthread_mutex_unlock(philo->right_fork);
             pthread_mutex_unlock(philo->left_fork);
@@ -64,7 +64,7 @@ void    release_forks(t_philo *philo)
 
 void think_philo(t_philo *philo)
 {
-    if (philo->data->someone_died)
+    if (check_death(philo))
         return;
     print_state("is thinking", philo);
     return ;
@@ -72,7 +72,7 @@ void think_philo(t_philo *philo)
 
 void eat_philo(t_philo *philo)
 {
-    if (philo->data->someone_died)
+    if (check_death(philo))
         return;
     
     pthread_mutex_lock(&philo->data->meal_lock);
@@ -87,7 +87,7 @@ void eat_philo(t_philo *philo)
 
 void sleep_philo(t_philo *philo)
 {
-    if (philo->data->someone_died)
+    if (check_death(philo))
         return;
     print_state("is sleeping", philo);
     ft_sleep(philo->data->args.time_to_sleep);
@@ -99,13 +99,20 @@ void die_philo(t_philo *philo)
 {
     long long time_stamp;
     
-    pthread_mutex_lock(&philo->data->print_lock);
+    pthread_mutex_lock(&philo->data->death_lock);
     if (!philo->data->someone_died)
     {
+        philo->data->someone_died = 1;
+        pthread_mutex_unlock(&philo->data->death_lock);
+        
+        pthread_mutex_lock(&philo->data->print_lock);
         time_stamp = current_timestamp() - philo->data->start_time;
         printf("%lld %d died\n", time_stamp, philo->id);
-        philo->data->someone_died = 1;
+        pthread_mutex_unlock(&philo->data->print_lock);
     }
-    pthread_mutex_unlock(&philo->data->print_lock);
+    else
+    {
+        pthread_mutex_unlock(&philo->data->death_lock);
+    }
     return ;
 }

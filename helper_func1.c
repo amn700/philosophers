@@ -4,16 +4,43 @@ void print_state(char *msg, t_philo *philo)
 {
     long long time_stamp;
 
-    if (philo->data->someone_died)
+    if (check_death(philo))
         return;
         
     pthread_mutex_lock(&philo->data->print_lock);
-    if (!philo->data->someone_died)
+    if (!check_death(philo))
     {
         time_stamp = current_timestamp() - philo->data->start_time;
         printf("%lld %d %s\n", time_stamp, philo->id, msg);
     }
     pthread_mutex_unlock(&philo->data->print_lock);
+}
+
+int check_death(t_philo *philo)
+{
+    int died;
+    
+    pthread_mutex_lock(&philo->data->death_lock);
+    died = philo->data->someone_died;
+    pthread_mutex_unlock(&philo->data->death_lock);
+    return (died);
+}
+
+int check_death_unsafe(t_data *data)
+{
+    int died;
+    
+    pthread_mutex_lock(&data->death_lock);
+    died = data->someone_died;
+    pthread_mutex_unlock(&data->death_lock);
+    return (died);
+}
+
+void set_death(t_philo *philo)
+{
+    pthread_mutex_lock(&philo->data->death_lock);
+    philo->data->someone_died = 1;
+    pthread_mutex_unlock(&philo->data->death_lock);
 }
 
 long long current_timestamp (void)

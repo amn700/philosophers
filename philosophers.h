@@ -24,6 +24,7 @@ typedef struct s_data
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_lock;
 	pthread_mutex_t	meal_lock;
+	pthread_mutex_t	death_lock;
 	pthread_mutex_t	ready_mutex;
 	int				someone_died;
 
@@ -48,6 +49,9 @@ void print_state(char *msg, t_philo *philo);
 void think_philo(t_philo *philo);
 void eat_philo(t_philo *philo);
 void sleep_philo(t_philo *philo);
+int check_death(t_philo *philo);
+int check_death_unsafe(t_data *data);
+void set_death(t_philo *philo);
 void die_philo(t_philo *philo);
 
 bool    init_args(t_args *args, int argc, char **argv);
