@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:47 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 12:14:56 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/07 17:09:58 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
