@@ -1,0 +1,152 @@
+#include "philosophers_bonus.h"
+
+bool    init_args(t_args *args, int argc, char **argv)
+{
+	args->philo_count = ft_atoi(argv[1]);
+	args->time_to_die = ft_atoi(argv[2]);
+	args->time_to_eat = ft_atoi(argv[3]);
+	args->time_to_sleep = ft_atoi(argv[4]);
+	if (argc == 6)
+		args->must_eat_count = ft_atoi(argv[5]);
+	else
+		args->must_eat_count = -1;
+
+	if (args->philo_count <= 0)
+		return (printf("invalid number of philos\n"), false);
+	if (args->philo_count > 200)
+		return (printf("too many philosophers (max 200)\n"), false);
+	if (args->time_to_die < 60)
+		return (printf("time_to_die must be at least 60ms\n"), false);
+	if (args->time_to_eat < 60)
+		return (printf("time_to_eat must be at least 60ms\n"), false);
+	if (args->time_to_sleep < 60)
+		return (printf("time_to_sleep must be at least 60ms\n"), false);
+	if (argc == 6 && args->must_eat_count < 0)
+		return (printf("invalid number for must_eat_count\n"), false);
+	return (true);
+}
+
+bool    init_data(t_args args, t_data *data)
+{
+    data->args = args;
+    data->start_time = 0;
+    
+    // Allocate memory for philosopher PIDs
+    data->philosophers = malloc(sizeof(pid_t) * args.philo_count);
+    if (!data->philosophers)
+        return (printf("malloc failed for philosophers array\n"), false);
+    
+    // Unlink semaphores in case they already exist
+    sem_unlink("/forks_sem");
+    sem_unlink("/writing_sem");
+    sem_unlink("/death_check_sem");
+    sem_unlink("/death_print_sem");
+    
+    // Create semaphores
+    data->forks = sem_open("/forks_sem", O_CREAT, 0644, args.philo_count);
+    if (data->forks == SEM_FAILED)
+        return (printf("sem_open failed for forks\n"), false);
+    data->writing = sem_open("/writing_sem", O_CREAT, 0644, 1);
+    if (data->writing == SEM_FAILED)
+        return (printf("sem_open failed for writing\n"), false);
+    data->death_check = sem_open("/death_check_sem", O_CREAT, 0644, 1);
+    if (data->death_check == SEM_FAILED)
+        return (printf("sem_open failed for death_check\n"), false);
+    data->death_print = sem_open("/death_print_sem", O_CREAT, 0644, 1);
+    if (data->death_print == SEM_FAILED)
+        return (printf("sem_open failed for death_print\n"), false);
+    return (true);
+}
+
+void   setup_philos(t_data *data, t_philo *philos)
+{
+    int i;
+
+    i = 0;
+    while (i < data->args.philo_count)
+    {
+        philos[i].id = i + 1;
+        philos[i].last_meal = 0;
+        philos[i].meals_eaten = 0;
+        philos[i].should_stop = 0;
+        philos[i].data = data;
+        i++;
+    }
+}
+
+int main(int argc, char **argv)
+{
+    t_philo			    *philos;
+    t_args			        args;
+    t_data			        data;
+    int				        i;
+    int                     status;
+    
+    //parsing arguments
+    if (argc != 5 && argc != 6)
+    {
+        print_error_msg();
+        return (1);
+    }
+    //init args and check for errors
+    if (!init_args(&args, argc, argv))
+		return (1);
+    //init data and check for errors
+    if (!init_data(args, &data))
+		return (1);
+    //init philosophers and semaphores
+    philos = malloc(sizeof(t_philo) * args.philo_count);
+    if (!philos)
+    {
+        free(data.philosophers);
+        return (printf("malloc failed\n"), 1);
+    }
+	setup_philos(&data, philos);
+    
+    // Set start time
+    data.start_time = current_timestamp();
+    
+    //create processes
+    i = 0;
+    while (i < args.philo_count)
+    {
+        data.philosophers[i] = fork();
+        if (data.philosophers[i] == 0)
+        {
+            // Child process - philosopher
+            philos[i].last_meal = data.start_time;
+            philosopher_routine(&philos[i]);
+            exit(0);
+        }
+        i++;
+    }
+    
+    //wait for any child to exit (either finished eating or died)
+    waitpid(-1, &status, 0);
+    
+    //terminate all remaining processes
+    i = 0;
+    while (i < args.philo_count)
+    {
+        kill(data.philosophers[i], SIGTERM);
+        i++;
+    }
+    
+    //wait for all processes to finish
+    while (waitpid(-1, &status, 0) > 0)
+        ;
+    
+    //cleanup semaphores
+    sem_close(data.forks);
+    sem_close(data.writing);
+    sem_close(data.death_check);
+    sem_close(data.death_print);
+    sem_unlink("/forks_sem");
+    sem_unlink("/writing_sem");
+    sem_unlink("/death_check_sem");
+    sem_unlink("/death_print_sem");
+    free(philos);
+    free(data.philosophers);
+    
+    return (0);
+}

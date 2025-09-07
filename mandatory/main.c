@@ -14,7 +14,7 @@ void	ft_sleep(unsigned int milisec)
 				+ (current.tv_usec - start.tv_usec) / 1000;
 		if (elapsed >= milisec)
 			break;
-		usleep(50);  // Reduced for better responsiveness
+		usleep(50);  // High precision timing
 	}
 }
 
@@ -27,7 +27,6 @@ void	monitor_routine(t_data *data, t_philo *philos)
 
 	while (!check_death_unsafe(data))
 	{
-		usleep(100);  // Very frequent checking for tight timing
 		i = 0;
 		full_count = 0;
 		while (i < data->args.philo_count && !check_death_unsafe(data))
@@ -40,13 +39,14 @@ void	monitor_routine(t_data *data, t_philo *philos)
 			pthread_mutex_unlock(&data->meal_lock);
 			
 			if (diff > data->args.time_to_die)
-				return die_philo(&philos[i]);
+			return die_philo(&philos[i]);
 			if (data->args.must_eat_count > 0 && times_eaten >= data->args.must_eat_count)
-				full_count++;
+			full_count++;
 			i++;
 		}
 		if (data->args.must_eat_count > 0 && full_count == data->args.philo_count)
 			return ;
+		usleep(100);  // High frequency for best responsiveness
 	}
 
 }
@@ -61,7 +61,7 @@ void *philosopher_routine(void *arg)
 	pthread_mutex_unlock(&philo->data->ready_mutex);  // Immediately unlock
 		
 	if (philo->id % 2 == 0)
-		usleep(100);  // Reduced from 300 for faster startup
+		usleep(50);  // Minimal delay for optimal performance
 	if (philo->data->args.philo_count == 1)
 	{
 		think_philo(philo);

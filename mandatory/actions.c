@@ -2,46 +2,24 @@
 
 void take_forks(t_philo *philo)
 {
-    // Quick death check before attempting to take forks
+    // Single death check at start to avoid redundant checking
     if (check_death(philo))
         return;
         
     if (philo->id % 2 == 0)
     {
         pthread_mutex_lock(philo->right_fork);
-        if (check_death(philo))
-        {
-            pthread_mutex_unlock(philo->right_fork);
-            return;
-        }
         print_state("has taken a fork", philo);
         
         pthread_mutex_lock(philo->left_fork);
-        if (check_death(philo))
-        {
-            pthread_mutex_unlock(philo->left_fork);
-            pthread_mutex_unlock(philo->right_fork);
-            return;
-        }
         print_state("has taken a fork", philo);
     }
     else
     {
         pthread_mutex_lock(philo->left_fork);
-        if (check_death(philo))
-        {
-            pthread_mutex_unlock(philo->left_fork);
-            return;
-        }
         print_state("has taken a fork", philo);
         
         pthread_mutex_lock(philo->right_fork);
-        if (check_death(philo))
-        {
-            pthread_mutex_unlock(philo->right_fork);
-            pthread_mutex_unlock(philo->left_fork);
-            return;
-        }
         print_state("has taken a fork", philo);
     }
 }

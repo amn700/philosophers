@@ -4,11 +4,9 @@ void print_state(char *msg, t_philo *philo)
 {
     long long time_stamp;
 
-    if (check_death(philo))
-        return;
-        
     pthread_mutex_lock(&philo->data->print_lock);
-    if (!check_death(philo))
+    // Check death inside the print lock to minimize lock cycles
+    if (!philo->data->someone_died)
     {
         time_stamp = current_timestamp() - philo->data->start_time;
         printf("%lld %d %s\n", time_stamp, philo->id, msg);
