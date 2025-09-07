@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:50 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 17:17:39 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 17:31:39 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,11 @@ void	*death_monitor(void *arg)
 	t_philo		*philo;
 	long long	current_time;
 	long long	last_meal_time;
+	int			should_continue;
 
 	philo = (t_philo *)arg;
-	while (!philo->should_stop)
+	should_continue = 1;
+	while (should_continue)
 	{
 		current_time = current_timestamp();
 		pthread_mutex_lock(&philo->meal_mutex);
@@ -49,6 +51,11 @@ void	*death_monitor(void *arg)
 			die_philo(philo);
 			return (NULL);
 		}
+		
+		pthread_mutex_lock(&philo->stop_mutex);
+		should_continue = !philo->should_stop;
+		pthread_mutex_unlock(&philo->stop_mutex);
+		
 		usleep(500);
 	}
 	return (NULL);
@@ -72,31 +79,66 @@ void	philosopher_routine(t_philo *philo)
 		
 		// Single philosopher can't eat (needs 2 forks, only 1 available)
 		// So just wait to die without taking any forks
-		while (!philo->should_stop)
-			usleep(1000);
+		int should_continue = 1;
+		while (should_continue)
+		{
+			pthread_mutex_lock(&philo->stop_mutex);
+			should_continue = !philo->should_stop;
+			pthread_mutex_unlock(&philo->stop_mutex);
+			if (should_continue)
+				usleep(1000);
+		}
 		
 		pthread_join(monitor_thread, NULL);
 		exit(0);
 	}
 	
-	while (!philo->should_stop)
+	int should_continue = 1;
+	while (should_continue)
 	{
 		think_philo(philo);
-		if (philo->should_stop)
+		
+		pthread_mutex_lock(&philo->stop_mutex);
+		should_continue = !philo->should_stop;
+		pthread_mutex_unlock(&philo->stop_mutex);
+		if (!should_continue)
 			break ;
+			
 		take_forks(philo);
-		if (philo->should_stop) 
-			return (release_forks(philo));
+		
+		pthread_mutex_lock(&philo->stop_mutex);
+		should_continue = !philo->should_stop;
+		pthread_mutex_unlock(&philo->stop_mutex);
+		if (!should_continue)
+		{
+			release_forks(philo);
+			break ;
+		}
+		
 		eat_philo(philo);
 		release_forks(philo);
+		
 		if (philo->data->args.must_eat_count != -1 && 
 			philo->meals_eaten >= philo->data->args.must_eat_count)
+		{
+			pthread_mutex_lock(&philo->stop_mutex);
 			philo->should_stop = 1;
-		if (philo->should_stop)
+			pthread_mutex_unlock(&philo->stop_mutex);
+		}
+		
+		pthread_mutex_lock(&philo->stop_mutex);
+		should_continue = !philo->should_stop;
+		pthread_mutex_unlock(&philo->stop_mutex);
+		if (!should_continue)
 			break ;
+			
 		sleep_philo(philo);
 	}
+	
+	pthread_mutex_lock(&philo->stop_mutex);
 	philo->should_stop = 1;
+	pthread_mutex_unlock(&philo->stop_mutex);
+	
 	pthread_join(monitor_thread, NULL);
 }
 
@@ -104,10 +146,18 @@ void	die_philo(t_philo *philo)
 {
 	long long	timestamp;
 
-	sem_wait(philo->data->death_print);
-	sem_wait(philo->data->writing);
-	timestamp = current_timestamp() - philo->data->start_time;
-	printf("%lld %d died\n", timestamp, philo->id);
-	sem_post(philo->data->writing);
-	exit(1);
+	pthread_mutex_lock(&philo->stop_mutex);
+	if (!philo->should_stop)
+	{
+		philo->should_stop = 1;
+		pthread_mutex_unlock(&philo->stop_mutex);
+		
+		sem_wait(philo->data->death_print);
+		sem_wait(philo->data->writing);
+		timestamp = current_timestamp() - philo->data->start_time;
+		printf("%lld %d died\n", timestamp, philo->id);
+		sem_post(philo->data->writing);
+		exit(1);
+	}
+	pthread_mutex_unlock(&philo->stop_mutex);
 }

@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:44 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 17:09:58 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/07 17:31:39 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ void	cleanup(t_data *data, t_philo *philos)
 	while (i < data->args.philo_count)
 	{
 		pthread_mutex_destroy(&philos[i].meal_mutex);
+		pthread_mutex_destroy(&philos[i].stop_mutex);
 		i++;
 	}
 	sem_close(data->forks);
@@ -93,13 +94,18 @@ void	setup_philos(t_data *data, t_philo *philos)
 	while (i < data->args.philo_count)
 	{
 		philos[i].id = i + 1;
-		philos[i].last_meal = 0;
+		philos[i].last_meal = current_timestamp();
 		philos[i].meals_eaten = 0;
 		philos[i].should_stop = 0;
 		philos[i].data = data;
 		if (pthread_mutex_init(&philos[i].meal_mutex, NULL) != 0)
 		{
 			printf("Failed to initialize meal mutex\n");
+			exit(1);
+		}
+		if (pthread_mutex_init(&philos[i].stop_mutex, NULL) != 0)
+		{
+			printf("Failed to initialize stop mutex\n");
 			exit(1);
 		}
 		i++;
@@ -117,7 +123,9 @@ void	multy_process_management(t_data *data, t_philo *philos, t_args *args)
 		data->philosophers[i] = fork();
 		if (data->philosophers[i] == 0)
 		{
+			pthread_mutex_lock(&philos[i].meal_mutex);
 			philos[i].last_meal = data->start_time;
+			pthread_mutex_unlock(&philos[i].meal_mutex);
 			philosopher_routine(&philos[i]);
 			exit(0);
 		}
