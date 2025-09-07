@@ -1,12 +1,24 @@
-#ifndef PHILOSOPHERS_H
-#define PHILOSOPHERS_H
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/07 08:25:05 by mohchaib          #+#    #+#             */
+/*   Updated: 2025/09/07 08:55:57 by mohchaib         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include <pthread.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/time.h>
+#ifndef PHILOSOPHERS_H
+# define PHILOSOPHERS_H
+
+# include <pthread.h>
+# include <stdio.h>
+# include <stdbool.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <sys/time.h>
 
 typedef struct s_args
 {
@@ -39,25 +51,23 @@ typedef struct s_philo
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*data;
-}	                t_philo;
+}					t_philo;
 
-void	ft_sleep(unsigned int milisec);
-long long current_timestamp (void);
-int     ft_atoi(char *str);
-
-void print_state(char *msg, t_philo *philo);
-void think_philo(t_philo *philo);
-void eat_philo(t_philo *philo);
-void sleep_philo(t_philo *philo);
-int check_death(t_philo *philo);
-int check_death_unsafe(t_data *data);
-void set_death(t_philo *philo);
-void die_philo(t_philo *philo);
-
-bool    init_args(t_args *args, int argc, char **argv);
-bool    init_data(t_args args, t_data *data);
-void setup_philos(t_data *data, t_philo *philos);
-
-void    take_forks(t_philo *philo);
-void    release_forks(t_philo *philo);
+void		*philosopher_routine(void *arg);
+void		ft_sleep(unsigned int milisec);
+long long	current_timestamp(void);
+int			ft_atoi(char *str);
+void		print_state(char *msg, t_philo *philo);
+void		think_philo(t_philo *philo);
+void		eat_philo(t_philo *philo);
+void		sleep_philo(t_philo *philo);
+int			check_death(t_philo *philo);
+int			check_death_unsafe(t_data *data);
+void		set_death(t_philo *philo);
+void		die_philo(t_philo *philo);
+bool		init_args(t_args *args, int argc, char **argv);
+bool		init_data(t_args args, t_data *data);
+void		setup_philos(t_data *data, t_philo *philos);
+void		take_forks(t_philo *philo);
+void		release_forks(t_philo *philo);
 #endif

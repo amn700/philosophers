@@ -57,9 +57,6 @@
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
-    "philosophers.h": "c",
-    "philosophers_bonus.h": "c",
-    "signal.h": "c",
-    "wait.h": "c"
+    "pthread.h": "c"
   }
 }

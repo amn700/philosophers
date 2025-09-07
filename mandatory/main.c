@@ -1,187 +1,101 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/07 08:25:00 by mohchaib          #+#    #+#             */
+/*   Updated: 2025/09/07 10:51:35 by mohchaib         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
 void	ft_sleep(unsigned int milisec)
 {
-	struct timeval start;
-	struct timeval current;
-	unsigned int elapsed;
+	struct timeval	start;
+	struct timeval	current;
+	unsigned int	elapsed;
 
 	gettimeofday(&start, NULL);
 	while (1)
 	{
 		gettimeofday(&current, NULL);
 		elapsed = (current.tv_sec - start.tv_sec) * 1000
-				+ (current.tv_usec - start.tv_usec) / 1000;
+			+ (current.tv_usec - start.tv_usec) / 1000;
 		if (elapsed >= milisec)
-			break;
-		usleep(50);  // High precision timing
+			break ;
+		usleep(50);
 	}
 }
 
-void	monitor_routine(t_data *data, t_philo *philos)
-{
-	long long	diff;
-	long long	now;
-    int			i;
-	int 		full_count;
-
-	while (!check_death_unsafe(data))
-	{
-		i = 0;
-		full_count = 0;
-		while (i < data->args.philo_count && !check_death_unsafe(data))
-		{
-			now = current_timestamp();
-			
-			pthread_mutex_lock(&data->meal_lock);
-			diff = now - philos[i].last_meal;
-			int times_eaten = philos[i].times_eaten;
-			pthread_mutex_unlock(&data->meal_lock);
-			
-			if (diff > data->args.time_to_die)
-			return die_philo(&philos[i]);
-			if (data->args.must_eat_count > 0 && times_eaten >= data->args.must_eat_count)
-			full_count++;
-			i++;
-		}
-		if (data->args.must_eat_count > 0 && full_count == data->args.philo_count)
-			return ;
-		usleep(100);  // High frequency for best responsiveness
-	}
-
-}
-
-void *philosopher_routine(void *arg)
-{
-	t_philo *philo = (t_philo *)arg;
-
-	// Wait for all philosophers to be created before starting
-	// Block until ready_mutex is unlocked by main thread
-	pthread_mutex_lock(&philo->data->ready_mutex);
-	pthread_mutex_unlock(&philo->data->ready_mutex);  // Immediately unlock
-		
-	if (philo->id % 2 == 0)
-		usleep(50);  // Minimal delay for optimal performance
-	if (philo->data->args.philo_count == 1)
-	{
-		think_philo(philo);
-		ft_sleep(philo->data->args.time_to_die);
-		return (NULL);
-	}
-	while (!check_death(philo))
-	{
-		think_philo(philo);
-		if (check_death(philo)) break;
-		
-		take_forks(philo);
-		if (check_death(philo)) break;
-		
-		eat_philo(philo);
-		release_forks(philo);  // Always release after eating
-		
-		if (philo->data->args.must_eat_count != -1)
-		{
-			pthread_mutex_lock(&philo->data->meal_lock);
-			int times_eaten = philo->times_eaten;
-			pthread_mutex_unlock(&philo->data->meal_lock);
-			if (times_eaten >= philo->data->args.must_eat_count)
-				return (NULL);
-		}
-		if (check_death(philo)) break;
-		
-		sleep_philo(philo);
-	}
-	return NULL;
-}
-
-void print_error_msg(void)
+void	print_error_msg(void)
 {
 	printf("invalid number of arguments\n"
-	"USAGE : [number_of_philosophers]"
-	" [time_to_die] [time_to_eat][time_to_sleep]"
-	" [number_of_times_each_philosopher_must_eat]\n");
+		"USAGE : [number_of_philosophers]"
+		" [time_to_die] [time_to_eat][time_to_sleep]"
+		" [number_of_times_each_philosopher_must_eat]\n");
 }
 
-int main (int argc, char **argv)
+void	start_simulation(t_data *data, t_philo *philos, t_args *args)
 {
-    t_philo			*philos;
-    t_args			args;
-    t_data			data;
-    int				i;
+	struct timeval	tv;
+	int				i;
 
-    if (argc < 5 || argc > 6)
-        return (print_error_msg(), 1);
-    if (!init_args(&args, argc, argv))
-		return (1);
-    philos = malloc(sizeof(t_philo) * args.philo_count);
-    if (!philos)
-        return (perror("malloc failed"), 1);
-    if (!init_data(args, &data))
-	{
-		free(philos);
-		return (1);
-	}
-	setup_philos(&data, philos);
-	i = 0;
-	// Create all philosopher threads first
-	while (i < args.philo_count)
-	{
-		if (pthread_create(&philos[i].thread, NULL, philosopher_routine, &philos[i]) != 0)
-		{
-			printf("Error: Failed to create thread for philosopher %d\n", i + 1);
-			data.someone_died = 1;  // Signal other threads to stop
-			// Wait for already created threads
-			int j = 0;
-			while (j < i)
-				pthread_join(philos[j++].thread, NULL);
-			// Cleanup
-			pthread_mutex_unlock(&data.ready_mutex);
-			j = 0;
-			while (j < args.philo_count)
-				pthread_mutex_destroy(&data.forks[j++]);
-			pthread_mutex_destroy(&data.print_lock);
-			pthread_mutex_destroy(&data.meal_lock);
-			pthread_mutex_destroy(&data.death_lock);
-			pthread_mutex_destroy(&data.ready_mutex);
-			free(data.forks);
-			free(philos);
-			return (1);
-		}
-		i++;
-	}
-	
-	// Now set the actual starting time
-	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	data.start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-	
-	// Update all philosophers' last_meal with the actual start time
+	data->start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 	i = 0;
-	while (i < args.philo_count)
+	while (i < args->philo_count)
 	{
-		pthread_mutex_lock(&data.meal_lock);
-		philos[i].last_meal = data.start_time;
-		pthread_mutex_unlock(&data.meal_lock);
+		pthread_mutex_lock(&data->meal_lock);
+		philos[i].last_meal = data->start_time;
+		pthread_mutex_unlock(&data->meal_lock);
 		i++;
 	}
-	
-	// Now signal all philosophers to start by unlocking the barrier
-	pthread_mutex_unlock(&data.ready_mutex);
-	
-	monitor_routine(&data, philos);
-    i = 0;
-	while (i < args.philo_count)
-		pthread_join(philos[i++].thread, NULL);
-	
-	// Cleanup
+	pthread_mutex_unlock(&data->ready_mutex);
+}
+
+void	cleanup(t_data *data, t_philo *philos, int created_count, t_args *args)
+{
+	int	i;
+
+	printf("Error: Failed to create thread for philosopher %d\n", i + 1);
+	data->someone_died = 1;
 	i = 0;
-	while (i < args.philo_count)
-		pthread_mutex_destroy(&data.forks[i++]);
-	pthread_mutex_destroy(&data.print_lock);
-	pthread_mutex_destroy(&data.meal_lock);
-	pthread_mutex_destroy(&data.death_lock);
-	pthread_mutex_destroy(&data.ready_mutex);
-	free(data.forks);
+	while (i < created_count)
+		pthread_join(philos[i++].thread, NULL);
+	pthread_mutex_unlock(&data->ready_mutex);
+	i = 0;
+	while (i < args->philo_count)
+		pthread_mutex_destroy(&data->forks[i++]);
+	pthread_mutex_destroy(&data->print_lock);
+	pthread_mutex_destroy(&data->meal_lock);
+	pthread_mutex_destroy(&data->death_lock);
+	pthread_mutex_destroy(&data->ready_mutex);
+	free(data->forks);
 	free(philos);
+}
+
+int	main(int argc, char **argv)
+{
+	t_philo			*philos;
+	t_args			args;
+	t_data			data;
+
+	if (argc < 5 || argc > 6)
+		return (print_error_msg(), 1);
+	if (!init_args(&args, argc, argv))
+		return (1);
+	philos = malloc(sizeof(t_philo) * args.philo_count);
+	if (!philos)
+		return (perror("malloc failed"), 1);
+	if (!init_data(args, &data))
+		return (free(philos), 1);
+	setup_philos(&data, philos);
+	launch_threads(args, data, philos);
+	start_simulation(&data, philos, &args);
+	monitor_routine(&data, philos);
+	cleanup(&data, philos, args.philo_count, &args);
 	return (0);
 }
