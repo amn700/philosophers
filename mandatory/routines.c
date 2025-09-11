@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routines.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:50:39 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 20:55:19 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/11 10:41:12 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ void	monitor_routine(t_data *data, t_philo *philos)
 
 	while (current_timestamp() < data->start_time)
 		continue ;
+	usleep(1000);
 	while (!check_death(philos))
 	{
 		full_count = 0;
@@ -70,7 +71,7 @@ void	one_philo_routine(t_philo *philo)
 			philo->data->someone_died = 1;
 			pthread_mutex_unlock(&philo->data->death_lock);
 			pthread_mutex_lock(&philo->data->print_lock);
-			printf("%d %d died\n", philo->data->args.time_to_die, philo->id);
+			print_death(philo->data->args.time_to_die, philo->id);
 			pthread_mutex_unlock(&philo->data->print_lock);
 		}
 		else

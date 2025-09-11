@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:52:50 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 20:47:32 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/11 10:41:12 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,10 @@ void	ft_sleep(unsigned int milisec)
 
 void	print_error_msg(void)
 {
-	printf("invalid number of arguments\n"
-		"USAGE : [number_of_philosophers]"
-		" [time_to_die] [time_to_eat][time_to_sleep]"
-		" [number_of_times_each_philosopher_must_eat]\n");
+	ft_write_error("invalid number of arguments\n");
+	ft_write_error("USAGE : [number_of_philosophers]");
+	ft_write_error(" [time_to_die] [time_to_eat][time_to_sleep]");
+	ft_write_error(" [number_of_times_each_philosopher_must_eat]\n");
 }
 
 void	start_simulation(t_data *data, t_philo *philos, t_args *args)
@@ -90,7 +90,7 @@ int	main(int argc, char **argv)
 		return (1);
 	philos = malloc(sizeof(t_philo) * args.philo_count);
 	if (!philos)
-		return (printf("malloc failed\n"), 1);
+		return (ft_write_error("malloc failed\n"), 1);
 	if (!init_data(args, &data))
 		return (free(philos), 1);
 	setup_philos(&data, philos);

@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:57 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 16:27:48 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/11 10:41:12 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	die_philo(t_philo *philo)
 		pthread_mutex_unlock(&philo->data->death_lock);
 		pthread_mutex_lock(&philo->data->print_lock);
 		time_stamp = current_timestamp() - philo->data->start_time;
-		printf("%lld %d died\n", time_stamp, philo->id);
+		print_death(time_stamp, philo->id);
 		pthread_mutex_unlock(&philo->data->print_lock);
 	}
 	else
@@ -42,17 +42,17 @@ bool	init_args(t_args *args, int argc, char **argv)
 	else
 		args->must_eat_count = -1;
 	if (args->philo_count <= 0)
-		return (printf("invalid number of philos\n"), false);
+		return (ft_write_error("invalid number of philos\n"), false);
 	if (args->philo_count > 200)
-		return (printf("too many philosophers (max 200)\n"), false);
+		return (ft_write_error("too many philosophers (max 200)\n"), false);
 	if (args->time_to_die < 60)
-		return (printf("time_to_die must be at least 60ms\n"), false);
+		return (ft_write_error("time_to_die must be at least 60ms\n"), false);
 	if (args->time_to_eat < 60)
-		return (printf("time_to_eat must be at least 60ms\n"), false);
+		return (ft_write_error("time_to_eat must be at least 60ms\n"), false);
 	if (args->time_to_sleep < 60)
-		return (printf("time_to_sleep must be at least 60ms\n"), false);
+		return (ft_write_error("time_to_sleep must be at least 60ms\n"), false);
 	if (argc == 6 && args->must_eat_count < 0)
-		return (printf("invalid number for must_eat_count\n"), false);
+		return (ft_write_error("invalid number for must_eat_count\n"), false);
 	return (true);
 }
 
@@ -64,7 +64,7 @@ bool	init_data(t_args args, t_data *data)
 	data->start_time = 0;
 	data->forks = malloc(sizeof(pthread_mutex_t) * args.philo_count);
 	if (!data->forks)
-		return (printf("malloc failed"), false);
+		return (ft_write_error("malloc failed\n"), false);
 	i = 0;
 	while (i < args.philo_count)
 		pthread_mutex_init(&data->forks[i++], NULL);

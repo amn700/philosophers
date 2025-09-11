@@ -14,12 +14,7 @@
 
 int	check_stop_condition(t_philo *philo)
 {
-	int	should_stop;
-
-	pthread_mutex_lock(&philo->meal_mutex);
-	should_stop = philo->should_stop;
-	pthread_mutex_unlock(&philo->meal_mutex);
-	return (should_stop);
+	return (philo->should_stop);
 }
 
 void	execute_philosopher_cycle(t_philo *philo)
@@ -43,12 +38,10 @@ int	check_meal_completion(t_philo *philo)
 {
 	int	completed;
 
-	pthread_mutex_lock(&philo->meal_mutex);
 	completed = (philo->data->args.must_eat_count != -1
 			&& philo->meals_eaten >= philo->data->args.must_eat_count);
 	if (completed)
 		philo->should_stop = 1;
-	pthread_mutex_unlock(&philo->meal_mutex);
 	return (completed);
 }
 
@@ -57,12 +50,10 @@ int	check_death_condition(t_philo *philo, long long current_time)
 	long long	last_meal_time;
 	int			should_die;
 
-	pthread_mutex_lock(&philo->meal_mutex);
 	last_meal_time = philo->last_meal;
 	should_die = (current_time - last_meal_time > philo->data->args.time_to_die
 			&& !philo->should_stop);
 	if (should_die)
 		philo->should_stop = 1;
-	pthread_mutex_unlock(&philo->meal_mutex);
 	return (should_die);
 }

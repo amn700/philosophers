@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:25:05 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 16:27:48 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/11 10:41:12 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/time.h>
+# include <limits.h>
 
 typedef struct s_args
 {
@@ -58,6 +59,12 @@ void		*philosopher_routine(void *arg);
 void		ft_sleep(unsigned int milisec);
 long long	current_timestamp(void);
 int			ft_atoi(char *str);
+void		ft_putlongnbr(long long nbr);
+void		print_death(long long timestamp, int id);
+void		print_state_write_mandatory(long long timestamp, int id,
+				char *state);
+int			ft_strlen(char *str);
+void		ft_write_error(char *msg);
 void		print_state(char *msg, t_philo *philo);
 void		think_philo(t_philo *philo);
 void		eat_philo(t_philo *philo);

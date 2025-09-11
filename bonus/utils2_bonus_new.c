@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils2_bonus.c                                     :+:      :+:    :+:   */
+/*   utils2_bonus_new.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -38,8 +38,34 @@ void	print_state_write(long long timestamp, int id, char *state)
 	(void)ret;
 }
 
+static void	cleanup_philosopher_semaphores(t_data *data, t_philo *philos)
+{
+	int		i;
+	char	sem_name[50];
+	char	*name_prefix;
+	int		j;
+
+	name_prefix = "/meal_sem_";
+	i = 0;
+	while (i < data->args.philo_count)
+	{
+		j = 0;
+		while (name_prefix[j])
+		{
+			sem_name[j] = name_prefix[j];
+			j++;
+		}
+		sem_name[j] = '0' + i;
+		sem_name[j + 1] = '\0';
+		sem_close(philos[i].meal_sem);
+		sem_unlink(sem_name);
+		i++;
+	}
+}
+
 void	cleanup(t_data *data, t_philo *philos)
 {
+	cleanup_philosopher_semaphores(data, philos);
 	sem_close(data->forks);
 	sem_close(data->writing);
 	sem_close(data->death_check);

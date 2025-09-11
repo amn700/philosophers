@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:47 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 21:04:08 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/11 10:48:42 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <sys/wait.h>
 # include <sys/types.h>
 # include <pthread.h>
+# include <limits.h>
 
 typedef struct s_args
 {
@@ -51,8 +52,6 @@ typedef struct s_philo
 	long long		last_meal;
 	int				meals_eaten;
 	int				should_stop;
-	pid_t			pid;
-	pthread_mutex_t	meal_mutex;
 	t_data			*data;
 }				t_philo;
 
@@ -60,7 +59,10 @@ long long	current_timestamp(void);
 void		ft_sleep(unsigned int milisec);
 int			ft_atoi(char *str);
 void		print_error_msg(void);
-int			check_death_status(t_philo *philo);
+void		ft_putlongnbr(long long nbr);
+void		print_state_write(long long timestamp, int id, char *state);
+int			ft_strlen(char *str);
+void		ft_write_error(char *msg);
 void		*death_monitor(void *arg);
 void		philosopher_routine(t_philo *philo);
 void		single_philo_routine(t_philo *philo);
@@ -77,4 +79,6 @@ void		die_philo(t_philo *philo);
 void		print_state(char *state, t_philo *philo);
 void		cleanup(t_data *data, t_philo *philos);
 void		wait_for_processes(t_args args, t_data data);
+bool		check_and_take_first_fork(t_philo *philo);
+bool		check_and_take_second_fork(t_philo *philo);
 #endif

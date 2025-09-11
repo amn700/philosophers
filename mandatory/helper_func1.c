@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   helper_func1.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohchaib <mohchaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:55 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 20:53:35 by mohchaib         ###   ########.fr       */
+/*   Updated: 2025/09/11 10:41:12 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,17 @@ void	print_state(char *msg, t_philo *philo)
 	died = philo->data->someone_died;
 	complete = philo->data->simulation_complete;
 	pthread_mutex_unlock(&philo->data->death_lock);
+	if (died || complete)
+		return ;
 	pthread_mutex_lock(&philo->data->print_lock);
+	pthread_mutex_lock(&philo->data->death_lock);
+	died = philo->data->someone_died;
+	complete = philo->data->simulation_complete;
+	pthread_mutex_unlock(&philo->data->death_lock);
 	if (!died && !complete)
 	{
 		time_stamp = current_timestamp() - philo->data->start_time;
-		printf("%lld %d %s\n", time_stamp, philo->id, msg);
+		print_state_write_mandatory(time_stamp, philo->id, msg);
 	}
 	pthread_mutex_unlock(&philo->data->print_lock);
 }

@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:50 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 21:04:06 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/11 10:53:45 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,19 +58,8 @@ void	single_philo_routine(t_philo *philo)
 {
 	print_state("is thinking", philo);
 	ft_sleep(philo->data->args.time_to_die);
-	pthread_mutex_lock(&philo->meal_mutex);
-	if (!philo->should_stop)
-	{
-		philo->should_stop = 1;
-		pthread_mutex_unlock(&philo->meal_mutex);
-		sem_wait(philo->data->writing);
-		printf("%lld %d died\n", current_timestamp()
-			- philo->data->start_time, philo->id);
-		fflush(stdout);
-		sem_post(philo->data->writing);
-	}
-	else
-		pthread_mutex_unlock(&philo->meal_mutex);
+	print_state_write(current_timestamp() - philo->data->start_time,
+		philo->id, "died");
 	exit(1);
 }
 
@@ -82,7 +71,7 @@ void	philosopher_routine(t_philo *philo)
 	if (philo->data->args.philo_count == 1)
 		single_philo_routine(philo);
 	if (pthread_create(&monitor_thread, NULL, death_monitor, philo) != 0)
-		return (printf("pthread_create failed\n"), exit(1));
+		return (ft_write_error("pthread_create failed\n"), exit(1));
 	while (1)
 	{
 		execute_philosopher_cycle(philo);
@@ -94,9 +83,7 @@ void	philosopher_routine(t_philo *philo)
 			break ;
 		sleep_philo(philo);
 	}
-	pthread_mutex_lock(&philo->meal_mutex);
 	philo->should_stop = 1;
-	pthread_mutex_unlock(&philo->meal_mutex);
 	pthread_join(monitor_thread, NULL);
 	exit(0);
 }
@@ -108,8 +95,6 @@ void	die_philo(t_philo *philo)
 	sem_wait(philo->data->death_print);
 	timestamp = current_timestamp() - philo->data->start_time;
 	sem_wait(philo->data->writing);
-	printf("%lld %d died\n", timestamp, philo->id);
-	fflush(stdout);
-	sem_post(philo->data->writing);
+	print_state_write(timestamp, philo->id, "died");
 	exit(1);
 }

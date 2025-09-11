@@ -1,18 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils2_bonus.c                                     :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/07 21:02:11 by codespace         #+#    #+#             */
+/*   Created: 2025/09/11 17:00:00 by codespace         #+#    #+#             */
 /*   Updated: 2025/09/11 10:41:12 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers_bonus.h"
+#include "philosophers.h"
 
-void	print_state_write(long long timestamp, int id, char *state)
+int	ft_strlen(char *str)
+{
+	int	len;
+
+	len = 0;
+	while (str[len])
+		len++;
+	return (len);
+}
+
+void	ft_write_error(char *msg)
+{
+	ssize_t	ret;
+
+	ret = write(1, msg, ft_strlen(msg));
+	(void)ret;
+}
+
+void	print_state_write_mandatory(long long timestamp, int id, char *state)
 {
 	ssize_t	ret;
 
@@ -33,21 +51,5 @@ void	print_state_write(long long timestamp, int id, char *state)
 	else if (state[0] == 'i' && state[1] == 's' && state[2] == ' '
 		&& state[3] == 't')
 		ret = write(1, "is thinking\n", 12);
-	else if (state[0] == 'd' && state[1] == 'i')
-		ret = write(1, "died\n", 5);
 	(void)ret;
-}
-
-void	cleanup(t_data *data, t_philo *philos)
-{
-	sem_close(data->forks);
-	sem_close(data->writing);
-	sem_close(data->death_check);
-	sem_close(data->death_print);
-	sem_unlink("/forks_sem");
-	sem_unlink("/writing_sem");
-	sem_unlink("/death_check_sem");
-	sem_unlink("/death_print_sem");
-	free(data->philosophers);
-	free(philos);
 }

@@ -1,40 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helper_func2.c                                     :+:      :+:    :+:   */
+/*   output_utils_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/07 20:53:27 by mohchaib          #+#    #+#             */
+/*   Created: 2025/09/11 17:00:00 by codespace         #+#    #+#             */
 /*   Updated: 2025/09/11 10:41:12 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "philosophers_bonus.h"
 
-int	ft_atoi(char *str)
+int	ft_strlen(char *str)
 {
-	long	total;
-	int		sign;
+	int	len;
 
-	total = 0;
-	sign = 1;
-	if (!str)
-		return (0);
-	while (*str == 32 || (*str >= 9 && *str <= 13))
-		str++;
-	if (*str == '-' || *str == '+')
-	{
-		if (*str == '-')
-			sign = -sign;
-		str++;
-	}
-	while (*str && *str >= '0' && *str <= '9')
-	{
-		total = total * 10 + (*str - '0');
-		str++;
-	}
-	return ((int)(sign * total));
+	len = 0;
+	while (str[len])
+		len++;
+	return (len);
+}
+
+void	ft_write_error(char *msg)
+{
+	ssize_t	ret;
+
+	ret = write(1, msg, ft_strlen(msg));
+	(void)ret;
 }
 
 void	ft_putlongnbr(long long nbr)
@@ -64,16 +57,4 @@ void	ft_putlongnbr(long long nbr)
 		ret = write(1, &"0123456789"[nbr % 10], 1);
 		(void)ret;
 	}
-}
-
-void	print_death(long long timestamp, int id)
-{
-	ssize_t	ret;
-
-	ft_putlongnbr(timestamp);
-	ret = write(1, " ", 1);
-	(void)ret;
-	ft_putlongnbr(id);
-	ret = write(1, " died\n", 6);
-	(void)ret;
 }

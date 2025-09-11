@@ -6,7 +6,7 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 08:24:42 by mohchaib          #+#    #+#             */
-/*   Updated: 2025/09/07 21:13:15 by codespace        ###   ########.fr       */
+/*   Updated: 2025/09/11 10:41:12 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,37 +67,19 @@ int	ft_atoi(char *str)
 
 void	print_state(char *state, t_philo *philo)
 {
-	pthread_mutex_lock(&philo->meal_mutex);
 	if (philo->should_stop)
-	{
-		pthread_mutex_unlock(&philo->meal_mutex);
-		return ;
-	}
-	pthread_mutex_unlock(&philo->meal_mutex);
-	if (check_death_status(philo))
 		return ;
 	sem_wait(philo->data->writing);
-	pthread_mutex_lock(&philo->meal_mutex);
 	if (!philo->should_stop)
-	{
-		pthread_mutex_unlock(&philo->meal_mutex);
-		if (check_death_status(philo))
-		{
-			sem_post(philo->data->writing);
-			return ;
-		}
-		printf("%lld %d %s\n", current_timestamp() - philo->data->start_time,
+		print_state_write(current_timestamp() - philo->data->start_time,
 			philo->id, state);
-	}
-	else
-		pthread_mutex_unlock(&philo->meal_mutex);
 	sem_post(philo->data->writing);
 }
 
 void	print_error_msg(void)
 {
-	printf("invalid number of arguments\n");
-	printf("USAGE : [number_of_philosophers] [time_to_die] ");
-	printf("[time_to_eat] [time_to_sleep] ");
-	printf("[number_of_times_each_philosopher_must_eat]\n");
+	ft_write_error("invalid number of arguments\n");
+	ft_write_error("USAGE : [number_of_philosophers] [time_to_die] ");
+	ft_write_error("[time_to_eat] [time_to_sleep] ");
+	ft_write_error("[number_of_times_each_philosopher_must_eat]\n");
 }
